@@ -1,0 +1,31 @@
+# Build outputs
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+
+# macOS
+.DS_Store
+
+# Secrets and environment-specific config — NEVER commit these
+appsettings.json
+appsettings.Development.json
+appsettings.Production.json
+appsettings.*.json
+!appsettings.json.example
+
+# Private student document storage
+private-uploads/
+
+# Legacy upload directory (should not exist in production, but exclude defensively)
+wwwroot/uploads/
+
+# IDE files
+.vs/
+.vscode/
+.idea/
+
+# Logs
+*.log

@@ -1,0 +1,303 @@
+@model StudentProjectPapers.Models.ContactFormViewModel
+@{
+    ViewData["Title"] = "Contact Us";
+    Layout = (User?.Identity?.IsAuthenticated ?? false) ? "_UserLayout" : "_Layout";
+}
+
+<style>
+    .contact-hero {
+        background: linear-gradient(135deg, #0B1F66, #081547);
+        color: #fff;
+        text-align: center;
+        padding: 4rem 1.5rem 8rem;
+        border-radius: 0 0 32px 32px;
+    }
+
+    .contact-hero h1 {
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+        font-size: 2.1rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .contact-hero p {
+        color: rgba(255,255,255,0.75);
+        font-size: 0.95rem;
+        max-width: 520px;
+        margin: 0 auto;
+    }
+
+    .contact-wrapper {
+        max-width: 1100px;
+        margin: -6rem auto 3rem;
+        padding: 0 1.25rem;
+    }
+
+    .contact-card {
+        background: #fff;
+        border-radius: 18px;
+        padding: 2rem;
+        box-shadow: 0 15px 40px rgba(11,31,102,0.15);
+        height: 100%;
+    }
+
+    .contact-card h5 {
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+        color: #1F2333;
+        margin-bottom: 1.5rem;
+    }
+
+    .contact-card label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #1F2333;
+        margin-bottom: 0.35rem;
+        display: block;
+    }
+
+    .contact-card .form-control,
+    .contact-card textarea.form-control {
+        border: 1px solid #E7E8F1;
+        border-radius: 10px;
+        background: #F6F7FB;
+        font-size: 0.9rem;
+        padding: 0.65rem 0.9rem;
+    }
+
+    .contact-card .form-control:focus {
+        border-color: #0B1F66;
+        box-shadow: 0 0 0 0.2rem rgba(11,31,102,0.12);
+        background: #fff;
+    }
+
+    .contact-privacy {
+        font-size: 0.82rem;
+        color: #6B7180;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-send {
+        background: #0B1F66;
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        padding: 0.65rem 1.75rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-send:hover {
+        background: #081547;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .contact-info h3 {
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+        color: #1F2333;
+        margin-bottom: 0.6rem;
+    }
+
+    .contact-info > p {
+        color: #6B7180;
+        font-size: 0.92rem;
+        line-height: 1.6;
+        margin-bottom: 1.75rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.85rem;
+        margin-bottom: 1.4rem;
+    }
+
+    .info-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1rem;
+        color: #fff;
+    }
+
+    .info-icon.bg-indigo { background: #0B1F66; }
+    .info-icon.bg-pink { background: #FF2D8D; }
+    .info-icon.bg-green { background: #198754; }
+    .info-icon.bg-orange { background: #ffc107; }
+
+    .info-item h6 {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #1F2333;
+        margin-bottom: 0.2rem;
+    }
+
+    .info-item p {
+        font-size: 0.85rem;
+        color: #6B7180;
+        margin: 0;
+    }
+
+    .contact-social {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        margin-top: 1.5rem;
+    }
+
+    .contact-social span {
+        font-weight: 600;
+        font-size: 0.88rem;
+        color: #1F2333;
+    }
+
+    .contact-social a {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #0B1F66;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 0.85rem;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .contact-social a:hover {
+        background: #FF2D8D;
+        transform: translateY(-2px);
+    }
+
+    .contact-success {
+        background: #E9F9EE;
+        border: 1px solid #B7EBC6;
+        color: #146C43;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 0.88rem;
+        margin-bottom: 1.25rem;
+    }
+</style>
+
+<div class="contact-hero">
+    <h1>Feel free to get in touch</h1>
+    <p>Have a question about projects, alumni records, or anything else? Send us a message and we'll get back to you soon.</p>
+</div>
+
+<div class="contact-wrapper">
+    <div class="row g-4 align-items-stretch">
+        <div class="col-lg-6">
+            <div class="contact-card">
+                <h5>Leave your message</h5>
+
+                @if (TempData["ContactSuccess"] != null)
+                {
+                    <div class="contact-success">@TempData["ContactSuccess"]</div>
+                }
+
+                <form asp-controller="Home" asp-action="Contact" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-sm-6 mb-3">
+                            <label>Name</label>
+                            <input asp-for="Name" class="form-control" placeholder="Your Name" />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <label>Email</label>
+                            <input asp-for="Email" class="form-control" placeholder="Your Email" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Subject</label>
+                        <input asp-for="Subject" class="form-control" placeholder="Subject" />
+                        <span asp-validation-for="Subject" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Message</label>
+                        <textarea asp-for="Message" class="form-control" rows="5" placeholder="Message"></textarea>
+                        <span asp-validation-for="Message" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <label class="contact-privacy">
+                            <input asp-for="AgreePrivacy" type="checkbox" />
+                            I agree to the privacy policy
+                        </label>
+                        <button type="submit" class="btn-send">Send Message</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="contact-info">
+                <h3>Don't hesitate to contact us</h3>
+                <p>Reach out with questions about the alumni portal, project submissions, or account access — our team is happy to help.</p>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="info-item">
+                            <div class="info-icon bg-indigo"><i class="fas fa-location-dot"></i></div>
+                            <div>
+                                <h6>Office</h6>
+                                <p>Texas College of Management &amp; IT, Kathmandu</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="info-item">
+                            <div class="info-icon bg-orange"><i class="fas fa-phone"></i></div>
+                            <div>
+                                <h6>Phone</h6>
+                                <p>(01) 111 444 90</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="info-item">
+                            <div class="info-icon bg-pink"><i class="fas fa-clock"></i></div>
+                            <div>
+                                <h6>Work Hours</h6>
+                                <p>Sun – Fri, 09 AM – 05 PM</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="info-item">
+                            <div class="info-icon bg-green"><i class="fas fa-envelope"></i></div>
+                            <div>
+                                <h6>Email</h6>
+                                <p>support@texascollege.edu.np</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-social">
+                    <span>Social Media:</span>
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" aria-label="Viber"><i class="fab fa-viber"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

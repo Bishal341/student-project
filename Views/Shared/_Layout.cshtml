@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Texas Alumni & Papers</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="~/css/site.css" rel="stylesheet" />
+    <style>
+            :root {
+                --pink: #FF2D8D;
+                --yellow: #F6B400;
+            }
+
+            body {
+                background: #ffffff;
+            }
+
+            .site-footer {
+                background: linear-gradient(135deg, #0B1F66, #081547);
+                color: rgba(255,255,255,0.75);
+                padding: 3rem 0 0;
+                font-family: "Inter", sans-serif;
+            }
+
+            .site-footer .footer-col h6 {
+                font-family: "Poppins", sans-serif;
+                font-weight: 700;
+                font-size: 0.95rem;
+                color: #fff;
+                margin-bottom: 1rem;
+                letter-spacing: 0.02em;
+            }
+
+            .site-footer .footer-col ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .site-footer .footer-col ul li {
+                margin-bottom: 0.65rem;
+            }
+
+            .site-footer .footer-col ul li a {
+                color: rgba(255,255,255,0.65);
+                text-decoration: none;
+                font-size: 0.88rem;
+                transition: color 0.2s ease, padding-left 0.2s ease;
+            }
+
+            .site-footer .footer-col ul li a:hover {
+                color: #FF2D8D;
+                padding-left: 3px;
+            }
+
+            .footer-brand {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .footer-brand-top {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .footer-brand-logo {
+                width: 84px;
+                height: 84px;
+                object-fit: contain;
+                border-radius: 50px;
+                background: #fff;
+                padding: 4px;
+                flex-shrink: 0;
+            }
+
+            .footer-brand-name {
+                display: block;
+                font-family: "Poppins", sans-serif;
+                font-weight: 700;
+                font-size: 1.55rem;
+                color: #fff;
+                line-height: 1;
+            }
+
+            .footer-brand-sub {
+                display: block;
+                font-size: 0.9rem;
+                letter-spacing: 0.15em;
+                text-transform: uppercase;
+                font-weight: 600;
+                color: #FF2D8D;
+                margin-top: 5px;
+            }
+
+            .footer-brand-desc {
+                font-size: 0.85rem;
+                color: rgba(255,255,255,0.7);
+                line-height: 1.6;
+                max-width: 280px;
+                margin: 0;
+            }
+
+            .footer-social-plain {
+                display: flex;
+                align-items: center;
+                gap: 1.1rem;
+            }
+
+            .footer-social-plain a {
+                color: rgba(255,255,255,0.75);
+                font-size: 1.35rem;
+                line-height: 1;
+                transition: color 0.25s ease;
+            }
+
+            .footer-social-plain a.fb:hover { color: #1877F2; }
+            .footer-social-plain a.ig:hover { color: #E4405F; }
+            .footer-social-plain a.viber:hover { color: #7360F2; }
+            .footer-social-plain a.li:hover { color: #0A66C2; }
+
+            .footer-divider {
+                border-color: rgba(255,255,255,0.12);
+                margin: 2rem 0 0;
+            }
+
+            .footer-bottom {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                padding: 1.1rem 1.5rem;
+                background: linear-gradient(135deg, #0B1F66, #081547);
+            }
+
+            .footer-bottom-links {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+            }
+
+            .footer-bottom-links a {
+                color: rgba(255,255,255,0.75);
+                text-decoration: none;
+                font-size: 0.85rem;
+                transition: color 0.2s ease;
+            }
+
+            .footer-bottom-links a:hover {
+                color: #FF2D8D;
+            }
+
+            
+
+            .footer-bottom p {
+                font-size: 0.8rem;
+                color: #fff;
+                margin: 0;
+            }
+
+
+        .footer-cta-banner {
+                padding: 1.5rem 1rem;
+                text-align: center;
+                background: linear-gradient(135deg, #0B1F66, #081547);
+            }
+
+            .footer-cta-banner-inner {
+                max-width: 700px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 1rem;
+                flex-wrap: wrap;
+                padding-bottom: 1.25rem;
+                border-bottom: 2px solid;
+                border-image: linear-gradient(90deg, #FF2D8D, #F6B400) 1;
+            }
+
+            .footer-cta-title {
+                font-family: 'Poppins', sans-serif;
+                font-weight: 600;
+                font-size: 1rem;
+                color: #fff;
+                margin: 0 10px 0 0;
+                line-height: 1.2;
+            }
+
+            .btn-help-cta {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                height: 30px;
+                padding: 0 16px;
+                background:#FF2D8D;
+                color: #fff;
+                border: 1px solid #FF2D8D;;
+                border-radius: 999px;
+                font-size: 0.82rem;
+                font-weight: 600;
+                text-decoration: none;
+                white-space: nowrap;
+                transition: background 0.2s ease, color 0.2s ease;
+            }
+
+            .btn-help-cta:hover {
+                background: #fff;
+                color: #0B1F66;
+            }
+
+            @@media (max-width: 576px) {
+                .footer-cta-banner-inner {
+                    flex-direction: column;
+                }
+            }
+
+    </style>
+</head>
+<body>
+
+    <!-- ===== Top Header Bar ===== -->
+    <nav class="navbar navbar-expand-lg regular-navbar">
+        <div class="container-fluid px-4">
+
+            <!-- Logo + Wordmark -->
+            <a class="navbar-brand d-flex align-items-center gap-2" asp-area="" asp-controller="Home" asp-action="Index">
+                <div class="brand-logo-box">
+                    <img src="~/image/tx.png" alt="Texas Logo" />
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">Texas Alumni &amp; Papers</span>
+                    <span class="brand-sub">College of Management &amp; IT</span>
+                </div>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewData["Title"]?.ToString() == "Home" ? "active" : "")"
+                           aria-current="@(ViewData["Title"]?.ToString() == "Home" ? "page" : "")"
+                           asp-controller="Home" asp-action="Index">
+                            Home
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle @((ViewData["Title"]?.ToString() == "Browse Projects" || ViewData["Title"]?.ToString() == "Upload Document") ? "active" : "")"
+                           href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Academics
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" asp-controller="Home" asp-action="BrowseProjects">Projects</a></li>
+                            <li><a class="dropdown-item" href="#">Research</a></li>
+                            <li><a class="dropdown-item" asp-controller="Home" asp-action="InternReport">Internships</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Community
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Alumni</a></li>
+                            <li><a class="dropdown-item" href="#">Mentorship</a></li>
+                            <li><a class="dropdown-item" href="#">Events</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Careers
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Jobs</a></li>
+                            <li><a class="dropdown-item" href="#">Resources</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewData["Title"]?.ToString() == "About" ? "active" : "")"
+                           href="#">
+                            About
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Right: Register / Login or User Dropdown -->
+                <ul class="navbar-nav align-items-center nav-actions">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item dropdown user-dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2"
+                               href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <div class="user-avatar">
+                                    <span>@(User.Identity.Name.Substring(0, 1).ToUpper())</span>
+                                </div>
+                                <span class="user-name-text">@User.Identity.Name</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    var currentAdmin = await UserManager.GetUserAsync(User);
+                                    var adminDashboardAction = StudentProjectPapers.Controllers.AdminController.GetDashboardActionForFaculty(currentAdmin?.Faculty);
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Admin" asp-action="@adminDashboardAction">
+                                            <i class="fas fa-user-shield me-2"></i> Admin Panel
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                }
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Home" asp-action="MyProfile">
+                                        <i class="fas fa-user me-2"></i> My Profile
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="navbar-auth-buttons">
+                            <a class="btn btn-register" asp-controller="Account" asp-action="Register">
+                                <i class="fas fa-user-plus me-1"></i> Register
+                            </a>
+                            <a class="btn btn-login" asp-controller="Account" asp-action="Login">
+                                Login <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </li>
+                    }
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <div class="content-wrapper">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+    <!--Help-->
+    <div class="footer-cta-banner">
+        <div class="container-fluid px-4 footer-cta-banner-inner">
+            <h2 class="footer-cta-title">Have a question or need help? We'd love to hear from you...</h2>
+            <a asp-controller="Home" asp-action="Contact" class="btn-help-cta">Help</a>
+        </div>
+    </div>
+
+    <!--Footer -->
+    <footer class="site-footer">
+        <div class="container-fluid px-4">
+            <div class="row">
+                <div class="col-12 col-lg-4 mb-4 footer-col">
+                    <div class="footer-brand">
+                        <div class="footer-brand-top">
+                            <img src="~/image/tx.png" alt="Texas College" class="footer-brand-logo" />
+                            <div>
+                                <span class="footer-brand-name">Texas Alumni</span>
+                                <span class="footer-brand-sub">Nepal</span>
+                            </div>
+                        </div>
+                        <p class="footer-brand-desc">
+                            Exploring and showcasing the academic legacy, alumni network, and student work of Texas College.
+                        </p>
+                        <div class="footer-social-plain">
+                            <a href="#" aria-label="Facebook" class="fb"><i class="fab fa-facebook"></i></a>
+                            <a href="#" aria-label="Instagram" class="ig"><i class="fab fa-instagram"></i></a>
+                            <a href="#" aria-label="Viber" class="viber"><i class="fab fa-viber"></i></a>
+                            <a href="#" aria-label="LinkedIn" class="li"><i class="fab fa-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 mb-4 footer-col">
+                    <h6>About</h6>
+                    <ul>
+                        <li><a href="#">Mission</a></li>
+                        <li><a href="#">Vision</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 mb-4 footer-col">
+                    <h6>Resources</h6>
+                    <ul>
+                        <li><a asp-controller="Home" asp-action="BrowseProjects">Projects</a></li>
+                        <li><a asp-controller="Home" asp-action="InternReport">Internships</a></li>
+                        <li><a href="#">Research</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2 mb-4 footer-col">
+                    <h6>Community</h6>
+                    <ul>
+                        <li><a href="#">Alumni</a></li>
+                        <li><a href="#">Mentors</a></li>
+                        <li><a href="#">Events</a></li>
+                        <li><a href="#">Forum</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <hr class="footer-divider" />
+        <div class="footer-bottom">
+            <p>&copy; @DateTime.Now.Year Texas Alumni &amp; Papers. All rights reserved.</p>
+            <div class="footer-bottom-links">
+                <a href="#">Privacy Policy</a>
+                <span class="footer-bottom-sep">|</span>
+                <a href="#">Terms & Conditions</a>
+                <span class="footer-bottom-sep">|</span>
+                <a href="#">FAQs</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,679 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "_Layout"; // change to your actual layout, or set to null
+}
+
+<style>
+   
+    .lp-wrap {
+        --lp-primary: #2B397D;
+        --lp-primary-dark: #1e2a5e;
+        --lp-violet: #5b4fcf;
+        --lp-text: #0f172a;
+        --lp-text-muted: #64748b;
+        --lp-border: #dde3f0;
+        --lp-danger: #dc2626;
+        --lp-danger-bg: #fef2f2;
+        --lp-danger-border: #fecaca;
+        --lp-radius: 14px;
+        --lp-radius-lg: 22px;
+        --lp-transition: .18s ease;
+    }
+
+        .lp-wrap, .lp-wrap *, .lp-wrap *::before, .lp-wrap *::after {
+            box-sizing: border-box;
+        }
+
+    
+    .content-wrapper:has(.lp-wrap) {
+        padding: 0 !important;
+        min-height: 0 !important;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    
+    body:has(.lp-wrap) {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+    main:has(.lp-wrap) {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .footer {
+        flex-shrink: 0;
+    }
+
+    .lp-wrap {
+        width: 100vw;
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(50% - 50vw);
+        flex: 1; 
+        min-height: 0; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 12px;
+        position: relative;
+        overflow: hidden;
+        background-color: #f5efe6;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cg fill='none' stroke='%232B397D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' opacity='0.20'%3E%3Cg transform='translate(14,18) scale(1.35)'%3E%3Cpath d='M12 3L1 9l11 6 9-4.91V17'/%3E%3Cpath d='M5 12v5c0 0 2.5 3 7 3s7-3 7-3v-5'/%3E%3C/g%3E%3Cg transform='translate(116,18) scale(1.35)'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cline x1='3' y1='9' x2='21' y2='9'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cpolyline points='9,14 11,16 15,12'/%3E%3C/g%3E%3Cg transform='translate(14,118) scale(1.35)'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpolyline points='12,7 12,12 15,15'/%3E%3C/g%3E%3Cg transform='translate(116,118) scale(1.35)'%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3Cpath d='M4,20 C4,16 7.6,13 12,13 C16.4,13 20,16 20,20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"), radial-gradient(ellipse at 12% 15%, rgba(210,140,60,.22) 0%, transparent 50%), radial-gradient(ellipse at 88% 88%, rgba(200,100,80,.16) 0%, transparent 50%), radial-gradient(ellipse at 55% 45%, rgba(240,200,100,.12) 0%, transparent 45%);
+        background-size: 200px 200px, 100% 100%, 100% 100%, 100% 100%;
+        background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+    }
+
+        .lp-wrap::before {
+            content: '';
+            position: absolute;
+            width: 420px;
+            height: 420px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(210,140,60,.18) 0%, transparent 70%);
+            top: -120px;
+            left: -120px;
+            animation: lpOrbDrift 15s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .lp-wrap::after {
+            content: '';
+            position: absolute;
+            width: 360px;
+            height: 360px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(200,100,80,.14) 0%, transparent 70%);
+            bottom: -90px;
+            right: -90px;
+            animation: lpOrbDrift 19s ease-in-out infinite alternate-reverse;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+    @@keyframes lpOrbDrift {
+        0% {
+            transform: translate(0,0) scale(1);
+        }
+
+        50% {
+            transform: translate(30px,-38px) scale(1.08);
+        }
+
+        100% {
+            transform: translate(-18px,24px) scale(.95);
+        }
+    }
+
+    .lp-shell {
+        width: 100%;
+        max-width: 1200px;
+        min-height: min(700px, 82vh); 
+        display: flex;
+        border-radius: var(--lp-radius-lg);
+        overflow: hidden;
+        box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 40px 100px rgba(0,0,0,.45), 0 6px 24px rgba(0,0,0,.25);
+        animation: lpFadeUp .55s cubic-bezier(.22,.68,0,1.2) both;
+        position: relative;
+        z-index: 1;
+        background: #fff;
+    }
+
+    @@keyframes lpFadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(24px) scale(.97);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .lp-brand-panel {
+        flex: 1 1 42%;
+        background: #1c2560;
+        padding: 72px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .lp-brand-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .lp-brand-logo-box {
+        width: 170px;
+        height: 170px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 3px solid rgba(255,255,255,.9);
+        box-shadow: 0 10px 30px rgba(0,0,0,.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-bottom: 32px;
+        transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+        .lp-brand-logo-box:hover {
+            transform: scale(1.05) rotate(-3deg);
+            box-shadow: 0 14px 38px rgba(0,0,0,.38);
+        }
+
+        .lp-brand-logo-box img {
+            width: 130px;
+            height: 130px;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+
+    .lp-brand-college-name {
+        font-size: 32px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: -.2px;
+    }
+
+    .lp-brand-college-sub {
+        font-size: 24px;
+        font-weight: 400;
+        color: rgba(255,255,255,.75);
+        margin-top: 10px;
+        line-height: 1.4;
+    }
+
+    .lp-brand-accent-bar {
+        display: none;
+    }
+
+    .lp-brand-tagline {
+        display: none;
+    }
+
+    .lp-login-panel {
+    flex: 0 0 620px;
+    background: #ffffff;
+    padding: 48px 64px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+        .lp-login-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--lp-primary) 0%, var(--lp-violet) 50%, #7c6ef5 100%);
+        }
+
+    .lp-signin-label {
+        font-size: 34px;
+        font-weight: 800;
+        color: var(--lp-text);
+        letter-spacing: -.5px;
+        margin-bottom: 8px;
+    }
+
+    .lp-signin-sub {
+        font-size: 16px;
+        color: var(--lp-text-muted);
+        margin-bottom: 26px;
+        line-height: 1.5;
+    }
+
+    .lp-field {
+        margin-bottom: 18px;
+    }
+
+    .lp-field-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        color: #374151;
+        text-transform: uppercase;
+        letter-spacing: .07em;
+        margin-bottom: 9px;
+    }
+
+    .lp-input-wrap {
+        display: flex;
+        align-items: stretch;
+        border: 1.5px solid var(--lp-border);
+        border-radius: var(--lp-radius);
+        background: #f8faff;
+        overflow: hidden;
+        transition: border-color var(--lp-transition), box-shadow var(--lp-transition), background var(--lp-transition);
+    }
+
+        .lp-input-wrap:focus-within {
+            border-color: var(--lp-primary);
+            background: #fff;
+            box-shadow: 0 0 0 3.5px rgba(43,57,125,.10);
+        }
+
+        .lp-input-wrap.lp-input-error {
+            border-color: var(--lp-danger);
+            background: var(--lp-danger-bg);
+        }
+
+    .lp-input-icon {
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+        color: #b0bbc8;
+        font-size: 16px;
+        flex-shrink: 0;
+        background: transparent;
+    }
+
+    .lp-input-wrap:focus-within .lp-input-icon {
+        color: var(--lp-primary);
+    }
+
+    .lp-form-control:-webkit-autofill,
+    .lp-form-control:-webkit-autofill:hover,
+    .lp-form-control:-webkit-autofill:focus {
+        -webkit-box-shadow: 0 0 0px 1000px #f8faff inset !important;
+        -webkit-text-fill-color: #000 !important;
+        caret-color: #000;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+
+    .lp-input-wrap:focus-within .lp-form-control:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0px 1000px #fff inset !important;
+    }
+
+    .lp-form-control {
+        flex: 1;
+        border: none;
+        background: transparent;
+        outline: none;
+        padding: 16px 12px 16px 0;
+        font-size: 16px;
+        font-weight: 500;
+        color: #000;
+        font-family: inherit;
+        width: 100%;
+        height: 100%;
+        align-self: stretch;
+    }
+
+        .lp-form-control::placeholder {
+            color: #b8c2d0;
+            font-weight: 400;
+        }
+
+    .lp-toggle-pw {
+        display: flex;
+        align-items: center;
+        background: none;
+        border: none;
+        padding: 0 14px;
+        cursor: pointer;
+        color: #b0bbc8;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+        .lp-toggle-pw:hover {
+            color: var(--lp-primary);
+        }
+
+    /* Back to home button */
+    .lp-back-home-link {
+        position: absolute;
+        top: 20px;
+        left: 24px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        font-weight: 700;
+        color: rgba(255,255,255,.85);
+        text-decoration: none;
+        z-index: 2;
+        transition: color var(--lp-transition), transform var(--lp-transition);
+    }
+
+        .lp-back-home-link:hover {
+            color: #fff;
+            transform: translateX(-2px);
+            text-decoration: underline;
+        }
+
+    .lp-back-arrow {
+        font-size: 15px;
+        line-height: 1;
+    }
+
+    .lp-error-text {
+        display: block;
+        margin-top: 6px;
+        font-size: 13px;
+        color: var(--lp-danger);
+        font-weight: 600;
+    }
+
+    .lp-summary-box {
+        background: var(--lp-danger-bg);
+        border: 1.5px solid var(--lp-danger-border);
+        border-radius: var(--lp-radius);
+        padding: 12px 14px;
+        margin-bottom: 18px;
+        font-size: 13.5px;
+        color: var(--lp-danger);
+        font-weight: 600;
+    }
+
+        .lp-summary-box ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+    .lp-login-btn {
+        width: 100%;
+        padding: 17px;
+        border: none;
+        border-radius: var(--lp-radius);
+        background: #081547;
+        color: #fff;
+        font-size: 17px;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        letter-spacing: .2px;
+        box-shadow: 0 4px 18px rgba(43,57,125,.32), 0 1px 4px rgba(0,0,0,.15);
+        transition: opacity var(--lp-transition), transform var(--lp-transition), box-shadow var(--lp-transition);
+        margin-top: 8px;
+    }
+
+        .lp-login-btn:hover {
+            opacity: .92;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 28px rgba(43,57,125,.40);
+        }
+
+        .lp-login-btn:active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+    .lp-signup-row {
+        text-align: center;
+        margin-top: 18px;
+        font-size: 14px;
+        color: var(--lp-text-muted);
+    }
+
+        .lp-signup-row a {
+            color: var(--lp-primary);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+            .lp-signup-row a:hover {
+                text-decoration: underline;
+            }
+
+    @@media (max-width: 900px) {
+    .lp-shell {
+        flex-direction: column;
+        width: 100%;
+        max-width: 480px;
+    }
+
+    .lp-brand-panel {
+        padding: 40px 24px 24px;
+        flex: none;
+    }
+
+    .lp-login-panel {
+        flex: none;
+        padding: 32px 28px;
+    }
+
+    .lp-back-home-link {
+        top: 14px;
+        left: 16px;
+        font-size: 13px;
+    }
+}
+
+    
+    @@media (max-width: 900px) and (max-height: 750px) {
+        .lp-wrap {
+            padding: 14px 10px;
+        }
+
+        .lp-shell {
+            min-height: auto;
+        }
+
+        .lp-brand-panel {
+            padding: 18px 24px 14px;
+        }
+
+        .lp-brand-logo-box {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+            .lp-brand-logo-box img {
+                width: 38px;
+                height: 38px;
+            }
+
+        .lp-brand-college-name {
+            font-size: 17px;
+        }
+
+        .lp-brand-college-sub {
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .lp-login-panel {
+            padding: 16px 22px 14px;
+        }
+
+        .lp-signin-label {
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+
+        .lp-signin-sub {
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .lp-field {
+            margin-bottom: 8px;
+        }
+
+        .lp-field-label {
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .lp-form-control {
+            padding: 8px 8px 8px 0;
+            font-size: 13px;
+        }
+
+        .lp-input-icon {
+            padding: 0 10px;
+            font-size: 14px;
+        }
+
+        .lp-login-btn {
+            padding: 11px;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .lp-signup-row {
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+       
+    }
+</style>
+
+<div class="lp-wrap">
+    <div class="lp-shell">
+
+        <a asp-controller="Home" asp-action="Index" class="lp-back-home-link">
+            <span class="lp-back-arrow">&larr;</span> Back to Home
+        </a>
+
+        <!-- LEFT — BRANDING PANEL -->
+        <div class="lp-brand-panel">
+            <div class="lp-brand-inner">
+                <div class="lp-brand-logo-box">
+                    <img src="~/image/logo.jpg" alt="Texas College Logo" />
+                </div>
+                <div class="lp-brand-college-name">Texas College</div>
+                <div class="lp-brand-college-sub">Student Project Papers</div>
+            </div>
+        </div>
+
+        <!-- RIGHT — REGISTER PANEL -->
+        <div class="lp-login-panel">
+
+            <div class="lp-signin-label">Create Account</div>
+            <div class="lp-signin-sub">Sign up to get started with your account</div>
+
+            <form asp-action="Register" method="post">
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="lp-summary-box" asp-validation-summary="ModelOnly"></div>
+                }
+
+                <!-- Full Name -->
+                <div class="lp-field">
+                    <label class="lp-field-label" asp-for="FullName"></label>
+                    <div class="lp-input-wrap">
+                        <span class="lp-input-icon" aria-hidden="true"><i class="bi bi-person-fill"></i></span>
+                        <input asp-for="FullName" class="lp-form-control" placeholder="Enter your full name" autocomplete="name" />
+                    </div>
+                    <span asp-validation-for="FullName" class="lp-error-text"></span>
+                </div>
+
+                <!-- Email -->
+                <div class="lp-field">
+                    <label class="lp-field-label" asp-for="Email"></label>
+                    <div class="lp-input-wrap">
+                        <span class="lp-input-icon" aria-hidden="true"><i class="bi bi-envelope-fill"></i></span>
+                        <input asp-for="Email" class="lp-form-control" placeholder="Enter your email" autocomplete="username" />
+                    </div>
+                    <span asp-validation-for="Email" class="lp-error-text"></span>
+                </div>
+
+                <!-- Faculty -->
+                <div class="lp-field">
+                    <label class="lp-field-label" asp-for="Faculty"></label>
+                    <div class="lp-input-wrap">
+                        <span class="lp-input-icon" aria-hidden="true"><i class="bi bi-mortarboard-fill"></i></span>
+                        <select asp-for="Faculty" class="lp-form-control">
+                            <option value="" disabled selected>Select your faculty</option>
+                            <option value="BIT">BIT (Bachelor in Information Technology)</option>
+                            <option value="BCS">BCS (Bachelor in Computer Science)</option>
+                            <option value="BBA">BBA (Bachelor in Business Administration)</option>
+                            <option value="Master">Master's Program</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="Faculty" class="lp-error-text"></span>
+                </div>
+
+                <!-- Password -->
+                <div class="lp-field">
+                    <label class="lp-field-label" asp-for="Password"></label>
+                    <div class="lp-input-wrap">
+                        <span class="lp-input-icon" aria-hidden="true"><i class="bi bi-lock-fill"></i></span>
+                        <input asp-for="Password" class="lp-form-control" placeholder="Create a password" autocomplete="new-password" />
+                        <span id="togglePassword" class="lp-toggle-pw" role="button" tabindex="0" aria-label="Show or hide password">
+                            <i class="bi bi-eye-slash-fill"></i>
+                        </span>
+                    </div>
+                    <span asp-validation-for="Password" class="lp-error-text"></span>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="lp-field">
+                    <label class="lp-field-label" asp-for="ConfirmPassword"></label>
+                    <div class="lp-input-wrap">
+                        <span class="lp-input-icon" aria-hidden="true"><i class="bi bi-lock-fill"></i></span>
+                        <input asp-for="ConfirmPassword" class="lp-form-control" placeholder="Re-enter your password" autocomplete="new-password" />
+                        <span id="toggleConfirmPassword" class="lp-toggle-pw" role="button" tabindex="0" aria-label="Show or hide confirm password">
+                            <i class="bi bi-eye-slash-fill"></i>
+                        </span>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="lp-error-text"></span>
+                </div>
+
+                <!-- Register button -->
+                <button type="submit" class="lp-login-btn">Create Account</button>
+
+            </form>
+
+            <div class="lp-signup-row">
+                Already have an account? <a asp-controller="Account" asp-action="Login">Sign in</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        var nonce = Context.Items["CspNonce"] as string;
+    }
+    <script nonce="@nonce">
+        function wireTogglePassword(toggleId, fieldId) {
+            var toggle = document.getElementById(toggleId);
+            var field = document.getElementById(fieldId);
+            if (!toggle || !field) return;
+            toggle.addEventListener("click", function () {
+                var icon = this.querySelector("i");
+                if (field.type === "password") {
+                    field.type = "text";
+                    icon.classList.remove("bi-eye-slash-fill");
+                    icon.classList.add("bi-eye-fill");
+                } else {
+                    field.type = "password";
+                    icon.classList.remove("bi-eye-fill");
+                    icon.classList.add("bi-eye-slash-fill");
+                }
+            });
+        }
+        wireTogglePassword("togglePassword", "Password");
+        wireTogglePassword("toggleConfirmPassword", "ConfirmPassword");
+    </script>
+}

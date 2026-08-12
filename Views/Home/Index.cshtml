@@ -1,0 +1,461 @@
+@inject Microsoft.AspNetCore.Identity.UserManager<StudentProjectPapers.Models.ApplicationUser> UserManager
+@model IEnumerable<StudentProjectPapers.Models.StudentProject>
+
+@{
+    ViewData["Title"] = "Home";
+    Layout = (User?.Identity?.IsAuthenticated ?? false) ? "_UserLayout" : "_Layout";
+}
+
+@if (User?.Identity != null && User.Identity.IsAuthenticated)
+{
+    var welcomeUser = await UserManager.GetUserAsync(User);
+
+    <style>
+        /* ===== Hero Banner ===== */
+        .home-banner {
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            position: relative;
+            height: 452px;
+        }
+
+            .home-banner img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+            .home-banner::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(180deg, rgba(11,31,102,0.15) 0%, rgba(11,31,102,0.75) 100%);
+            }
+
+        .home-banner-caption {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #fff;
+            padding: 0 1.5rem;
+        }
+
+            .home-banner-caption h2 {
+                font-family: "Poppins", sans-serif;
+                font-weight: 700;
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .home-banner-caption p {
+                font-size: 1.05rem;
+                opacity: 0.9;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+        /* ===== Intro Section ===== */
+        .intro-section {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2.25rem 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+            .intro-section h3 {
+                font-family: "Poppins", sans-serif;
+                font-weight: 700;
+                color: #1F2333;
+                margin-bottom: 0.75rem;
+            }
+
+            .intro-section p {
+                color: #6B7180;
+                font-size: 1rem;
+                line-height: 1.7;
+                margin-bottom: 0;
+            }
+
+        /* ===== Advantages ===== */
+        .advantages-heading {
+            font-family: "Poppins", sans-serif;
+            font-weight: 700;
+            color: #1F2333;
+            margin-bottom: 1.25rem;
+        }
+
+        .advantage-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 1.75rem 1.5rem;
+            text-align: center;
+            height: 100%;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .advantage-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+            }
+
+        .advantage-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.4rem;
+            color: #fff;
+        }
+
+            .advantage-icon.bg-indigo {
+                background: #081547;
+            }
+
+            .advantage-icon.bg-pink {
+                background: #FF2D8D;
+            }
+
+            .advantage-icon.bg-green {
+                background: #198754;
+            }
+
+            .advantage-icon.bg-orange {
+                background: #ffc107;
+            }
+
+        .advantage-card h5 {
+            font-family: "Poppins", sans-serif;
+            font-weight: 700;
+            font-size: 1.02rem;
+            color: #1F2333;
+            margin-bottom: 0.5rem;
+        }
+
+        .advantage-card p {
+            color: #6B7180;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* ===== Quick Actions ===== */
+        .quick-actions-section {
+            background: #0B1F66;
+            border-radius: 16px;
+            padding: 2rem 2.5rem;
+            margin: 2rem 0;
+            color: #fff;
+        }
+
+            .quick-actions-section h4 {
+                font-family: "Poppins", sans-serif;
+                font-weight: 700;
+                margin-bottom: 1.25rem;
+                color:#F6B400;
+                
+            }
+
+        .quick-action-btn {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: #fff;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.92rem;
+            transition: background 0.2s ease, transform 0.2s ease;
+            height: 100%;
+        }
+
+            .quick-action-btn:hover {
+                background: rgba(255, 45, 141, 0.5);
+                color: #fff;
+                transform: translateY(-2px);
+            }
+
+            .quick-action-btn i {
+                font-size: 1.3rem;
+                flex-shrink: 0;
+            }
+
+        /* ===== Recent Projects (existing) ===== */
+        .section-heading {
+            font-family: "Poppins", sans-serif;
+            font-weight: 600;
+            color: #1F2333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .project-title {
+            color: #3A2DC4;
+            font-weight: 600;
+        }
+
+        .card-footer {
+            border-top: none;
+            padding-bottom: 1rem;
+        }
+
+        .btn-download {
+            background:#FF2D8D ;
+            border-color: #FF2D8D;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .btn-download:hover {
+            background:#0B1F66;
+            border-color: #0B1F66;
+            color: #fff;
+        }
+
+        .recent-item {
+            color: #F6B400;
+        }
+
+    </style>
+
+    <!-- ===== HERO IMAGE ===== -->
+    <div class="home-banner">
+        <img src="/image/slide1.jpg" alt="Student Project Papers" />
+        <div class="home-banner-caption">
+            <h2>Welcome to Student Project Papers</h2>
+            <p>A shared home for every final-year project, intern report, and academic milestone — built by students, for students.</p>
+        </div>
+    </div>
+
+    <!-- ===== QUICK ACTIONS ===== -->
+    <div class="quick-actions-section">
+        <h4> Get Started</h4>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <a href="@Url.Action("InternReport", "Home")" class="quick-action-btn">
+                    <i class="fas fa-cloud-arrow-up"></i>
+                    <span>Upload Intern Report / Attendance / Letter</span>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="@Url.Action("BrowseProjects", "Home")" class="quick-action-btn">
+                    <i class="fas fa-search"></i>
+                    <span>Browse Alumni Projects</span>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="@Url.Action("MyActivity", "Home")" class="quick-action-btn">
+                    <i class="fas fa-clock-rotate-left"></i>
+                    <span>View My Activity</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== RECENT PROJECTS (existing) ===== -->
+    <h3 class="section-heading">
+        <i class="fas fa-file-alt recent-item"></i> Recent Projects
+    </h3>
+
+    <div class="row">
+        @if (Model.Any())
+        {
+            @foreach (var project in Model.Take(6))
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title project-title">@project.ProjectTitle</h5>
+                            <hr />
+                            <p class="card-text">
+                                <strong>Student:</strong> @project.StudentName<br />
+                                <strong>LCID:</strong> @project.LCID<br />
+                                <strong>Year:</strong> @(project.Year == 0 ? "N/A" : project.Year.ToString())<br />
+                                <strong>Submitted:</strong> @project.SubmittedDate.ToString("MMMM dd, yyyy")
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="@Url.Action("DownloadProject", "Home", new { id = project.Id })"
+                               class="btn btn-download btn-sm w-100">
+                                <i class="fas fa-download"></i> Download PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="alert alert-info">No projects available yet. Check back later!</div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <!-- ===== HERO SECTION ===== -->
+    <div class="alumni-hero">
+        <div class="container-fluid px-4">
+            <div class="hero-content">
+                <p class="hero-eyebrow">TEXAS COLLEGE OF MANAGEMENT &amp; IT</p>
+                <h1 class="hero-title">Welcome Back,<br />Texas Alumni</h1>
+                <p class="hero-subtitle">
+                    Connect with fellow graduates, explore career opportunities, and<br />
+                    stay up to date with your alma mater.
+                </p>
+                <div class="hero-actions">
+                    <a href="@Url.Action("BrowseProjects", "Home")" class="btn btn-hero-primary">
+                        <i class="fas fa-users me-2"></i> Browse Directory
+                    </a>
+                    <a href="@Url.Action("Register", "Account")" class="btn btn-hero-secondary">
+                        <i class="fas fa-file-alt me-2"></i> View Project Papers
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== STATS ROW ===== -->
+    <div class="stats-section">
+        <div class="container-fluid px-4">
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-blue">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-body">
+                            <span class="stat-number">12,400+</span>
+                            <span class="stat-label">Alumni Network</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-teal">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="stat-body">
+                            <span class="stat-number">65+</span>
+                            <span class="stat-label">Countries Represented</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-yellow">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="stat-body">
+                            <span class="stat-number">3,200+</span>
+                            <span class="stat-label">Employed Globally</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-orange">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-body">
+                            <span class="stat-number">1,000+</span>
+                            <span class="stat-label">Project Papers</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FEATURED ALUMNI + UPCOMING EVENTS ===== -->
+    <div class="main-content-section">
+        <div class="container-fluid px-4">
+            <div class="row g-4">
+
+                <!-- Featured Alumni -->
+                <div class="col-lg-12">
+                    <div class="section-header mb-3">
+                        <h2 class="section-title">Featured Alumni</h2>
+                        <a href="#" class="section-link">View all <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="alumni-card">
+                                <div class="alumni-card-top">
+                                    <div class="alumni-avatar alumni-avatar-1">AM</div>
+                                    <div>
+                                        <h6 class="alumni-name">Dr. Arjun Mehta</h6>
+                                        <span class="alumni-batch">MBA Batch 2010</span>
+                                    </div>
+                                </div>
+                                <hr class="alumni-divider" />
+                                <p class="alumni-role"><i class="fas fa-building me-2 text-muted"></i>VP, Goldman Sachs</p>
+                                <p class="alumni-location"><i class="fas fa-map-marker-alt me-2 text-muted"></i>New York, USA</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="alumni-card">
+                                <div class="alumni-card-top">
+                                    <div class="alumni-avatar alumni-avatar-2">LC</div>
+                                    <div>
+                                        <h6 class="alumni-name">Li Wei Chen</h6>
+                                        <span class="alumni-batch">MBA Batch 2015</span>
+                                    </div>
+                                </div>
+                                <hr class="alumni-divider" />
+                                <p class="alumni-role"><i class="fas fa-building me-2 text-muted"></i>Product Lead, Google</p>
+                                <p class="alumni-location"><i class="fas fa-map-marker-alt me-2 text-muted"></i>San Francisco, USA</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="alumni-card">
+                                <div class="alumni-card-top">
+                                    <div class="alumni-avatar alumni-avatar-3">KA</div>
+                                    <div>
+                                        <h6 class="alumni-name">Kwame Asante</h6>
+                                        <span class="alumni-batch">MBA Batch 2012</span>
+                                    </div>
+                                </div>
+                                <hr class="alumni-divider" />
+                                <p class="alumni-role"><i class="fas fa-building me-2 text-muted"></i>CEO, FinTech Ventures</p>
+                                <p class="alumni-location"><i class="fas fa-map-marker-alt me-2 text-muted"></i>Lagos, Nigeria</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="alumni-card">
+                                <div class="alumni-card-top">
+                                    <div class="alumni-avatar alumni-avatar-4">SR</div>
+                                    <div>
+                                        <h6 class="alumni-name">Sofia Ramirez</h6>
+                                        <span class="alumni-batch">MBA Batch 2018</span>
+                                    </div>
+                                </div>
+                                <hr class="alumni-divider" />
+                                <p class="alumni-role"><i class="fas fa-building me-2 text-muted"></i>Strategy Dir., McKinsey</p>
+                                <p class="alumni-location"><i class="fas fa-map-marker-alt me-2 text-muted"></i>Madrid, Spain</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}

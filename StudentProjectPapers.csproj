@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>9e6d4609-0038-48b5-a322-50fa5b5942b0</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.17.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+  </ItemGroup>
+
+</Project>

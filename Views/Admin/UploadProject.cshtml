@@ -1,0 +1,119 @@
+﻿@model StudentProjectPapers.Models.UploadProjectViewModel
+
+@{
+    ViewData["Title"] = "Upload Project";
+}
+
+<h2>Upload Student Project</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="UploadProject" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5>Project Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="LCID" class="form-label"></label>
+                            <input asp-for="LCID" class="form-control" placeholder="e.g., CS-2024-001" />
+                            <span asp-validation-for="LCID" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="StudentName" class="form-label"></label>
+                            <input asp-for="StudentName" class="form-control" />
+                            <span asp-validation-for="StudentName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="SubmittedDate" class="form-label"></label>
+                            <input asp-for="SubmittedDate" type="date" class="form-control" />
+                            <span asp-validation-for="SubmittedDate" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Year" class="form-label"></label>
+                            <input asp-for="Year" type="number" class="form-control" placeholder="e.g., 2024" />
+                            <span asp-validation-for="Year" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ProjectTitle" class="form-label"></label>
+                        <input asp-for="ProjectTitle" class="form-control" />
+                        <span asp-validation-for="ProjectTitle" class="text-danger"></span>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="SupervisorName" class="form-label"></label>
+                            <input asp-for="SupervisorName" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Department" class="form-label"></label>
+                            @if (ViewBag.LockedFaculty != null)
+                            {
+                                <input class="form-control" value="@ViewBag.LockedFaculty" readonly disabled />
+                                <input type="hidden" asp-for="Department" value="@ViewBag.LockedFaculty" />
+                                <small class="text-muted">Projects you upload always go to your own faculty's dashboard.</small>
+                            }
+                            else
+                            {
+                                <input asp-for="Department" class="form-control" placeholder="e.g., BIT, BCS, BBA, Master" />
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Brief description of the project..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PdfFile" class="form-label"></label>
+                        <input asp-for="PdfFile" type="file" class="form-control" accept=".pdf" />
+                        <span asp-validation-for="PdfFile" class="text-danger"></span>
+                        <small class="form-text text-muted">Only PDF files are allowed (Max size: 10MB)</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Upload Project</button>
+                <a asp-controller="Admin" asp-action="@(ViewBag.DashboardAction ?? "DashboardSuperAdmin")" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">Instructions:</h5>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check-circle text-success"></i> Ensure PDF is properly formatted</li>
+                    <li><i class="fas fa-check-circle text-success"></i> Maximum file size: 10MB</li>
+                    <li><i class="fas fa-check-circle text-success"></i> Use descriptive project titles</li>
+                    <li><i class="fas fa-check-circle text-success"></i> Include supervisor information</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

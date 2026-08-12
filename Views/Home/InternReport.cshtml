@@ -1,0 +1,246 @@
+﻿@{
+    ViewData["Title"] = "Upload Document";
+    Layout = "_UserLayout";
+}
+
+<style>
+    .upload-card .card-header {
+        background: #0B1F66;
+        color: #fff;
+        border-radius: var(--radius) var(--radius) 0 0;
+        padding: 1rem 1.4rem;
+    }
+
+    .upload-card .card-header h5 { margin: 0; font-family: "Poppins", sans-serif; font-weight: 600; }
+
+    .criteria-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.65rem;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.9rem;
+    }
+
+    .criteria-item:last-child { border-bottom: none; }
+    .criteria-item i { color:#FF2D8D; margin-top: 2px; flex-shrink: 0; }
+
+    .info-banner {
+        background: #0B1F66;
+        border-radius: var(--radius);
+        padding: 1.5rem 2rem;
+        color: #fff;
+        margin-bottom: 1.75rem;
+    }
+
+    .info-banner h4 { font-family: "Poppins", sans-serif; font-weight: 700; margin-bottom: 0.4rem; }
+    .info-banner p { opacity: 0.85; margin: 0; font-size: 0.92rem; }
+
+    .doc-type-select {
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        padding: 0.65rem 1rem;
+        font-weight: 600;
+        color: var(--ink);
+        background: #fff;
+    }
+
+    .doc-type-select:focus {
+        border-color: var(--brand-indigo);
+        box-shadow: 0 0 0 0.2rem rgba(58,45,196,0.12);
+    }
+
+    .doc-field { display: none; }
+    .doc-field.active { display: block; }
+
+    .help-box {
+        background: var(--brand-pink-light);
+        border-radius: var(--radius);
+        padding: 1.1rem 1.3rem;
+        font-size: 0.85rem;
+        color: var(--ink);
+    }
+
+    .help-box i { color: #FF2D8D; }
+
+     .btn-submit {
+        background: #0B1F66;
+        border-color: #0B1F66;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .btn-submit:hover {
+        background:#081547 ;
+        border-color: #081547;
+        color: #fff;
+    }
+</style>
+
+<div class="info-banner">
+    <h4> Document Submission</h4>
+    <p>Submit your intern report, attendance report, or internship letter for review. All submissions are verified by admin before being marked complete.</p>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card upload-card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-cloud-arrow-up"></i> Upload Document</h5>
+            </div>
+            <div class="card-body p-4">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show">
+                        @TempData["Success"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        @TempData["Error"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <form asp-controller="Home" asp-action="UploadDocument" method="post" enctype="multipart/form-data">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Document Type</label>
+                        <select name="documentType" id="documentType" class="form-select doc-type-select" required>
+                            <option value="" disabled selected>Select document type</option>
+                            <option value="InternReport">Intern Report</option>
+                            <option value="AttendanceReport">Attendance Report</option>
+                            <option value="Letter">Internship Letter</option>
+                        </select>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Full Name</label>
+                            <input type="text" name="studentName" class="form-control" placeholder="Your full name" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">LCID</label>
+                            <input type="text" name="lcid" class="form-control" placeholder="e.g. LC00017003257" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="Enter a title for this document" required />
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Company / Organization</label>
+                            <input type="text" name="companyName" class="form-control" placeholder="Where you interned" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Year</label>
+                            <input type="number" name="year" class="form-control" placeholder="e.g. 2026" required />
+                        </div>
+                    </div>
+
+                    <!-- Intern Report specific -->
+                    <div class="doc-field" data-type="InternReport">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Supervisor Name</label>
+                            <input type="text" name="supervisorName" class="form-control" placeholder="Internship supervisor" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Description</label>
+                            <textarea name="description" class="form-control" rows="3"
+                                      placeholder="Brief summary of your internship..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Attendance Report specific -->
+                    <div class="doc-field" data-type="AttendanceReport">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Month / Period Covered</label>
+                            <input type="text" name="extraInfo" class="form-control" placeholder="e.g. June 2026" />
+                        </div>
+                    </div>
+
+                    <!-- Letter specific -->
+                    <div class="doc-field" data-type="Letter">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Purpose of Letter</label>
+                            <input type="text" name="extraInfo" class="form-control" placeholder="e.g. Proof of internship completion" />
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-file-pdf" style="color:var(--brand-pink);"></i>
+                            Upload File
+                        </label>
+                        <input type="file" name="documentFile" class="form-control" accept=".pdf,.jpg,.jpeg,.png" required />
+                        <small class="text-muted mt-1 d-block">PDF or image files — maximum size 10MB</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-submit w-100">
+                        <i class="fas fa-cloud-arrow-up"></i> Submit Document
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3" style="color:#0B1F66;">
+                    <i class="fas fa-circle-info"></i> Submission Criteria
+                </h6>
+                <div class="criteria-item">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>File format must be <strong>PDF or image</strong></span>
+                </div>
+                <div class="criteria-item">
+                    <i class="fas fa-weight-hanging"></i>
+                    <span>Maximum file size: <strong>10 MB</strong></span>
+                </div>
+                <div class="criteria-item">
+                    <i class="fas fa-heading"></i>
+                    <span>Use a clear, descriptive <strong>title</strong></span>
+                </div>
+                <div class="criteria-item">
+                    <i class="fas fa-building"></i>
+                    <span>Include the <strong>company/organization</strong> name</span>
+                </div>
+                <div class="criteria-item">
+                    <i class="fas fa-id-card"></i>
+                    <span>Double-check your <strong>LCID number</strong></span>
+                </div>
+                <div class="criteria-item">
+                    <i class="fas fa-triangle-exclamation" style="color:var(--brand-pink);"></i>
+                    <span>Submissions are <strong>reviewed by admin</strong> before approval</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-box">
+            <i class="fas fa-circle-question"></i>
+            <strong>Need help?</strong> Contact your department coordinator or the admin if you have submission issues.
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        var nonce = Context.Items["CspNonce"] as string;
+    }
+    <script nonce="@nonce">
+        const typeSelect = document.getElementById('documentType');
+        const allFields = document.querySelectorAll('.doc-field');
+
+        typeSelect.addEventListener('change', function () {
+            allFields.forEach(f => f.classList.remove('active'));
+            const match = document.querySelector('.doc-field[data-type="' + this.value + '"]');
+            if (match) match.classList.add('active');
+        });
+    </script>
+}

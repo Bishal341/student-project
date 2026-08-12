@@ -1,0 +1,157 @@
+﻿@model IEnumerable<StudentProjectPapers.Models.StudentProject>
+
+@{
+    ViewData["Title"] = "Browse Projects";
+    Layout = "_UserLayout";
+}
+
+<style>
+    .filter-card .card-header {
+        background: #0B1F66;
+        color: #fff;
+        border-radius: var(--radius) var(--radius) 0 0;
+        padding: 1rem 1.4rem;
+    }
+
+    .filter-card .card-header h5 { 
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        font-weight: 600; 
+    }
+    .filter-card {
+        border-radius: var(--radius);
+        overflow: hidden;
+        margin-bottom: 1.75rem;
+    }
+    .project-card-title {
+        color: #3A2DC4;
+        font-weight: 600; 
+    }
+    .card-footer { 
+        border-top: none;
+        padding-bottom: 1rem;
+    }
+    .btn-search{
+        background:#0d6efd;
+        border-color:#0d6efd;
+        padding:6px 10px;
+        border-radius:4px;
+    }
+
+    .btn-search:hover {
+        background: #0a58ca;
+        border-color: #0a58ca;
+        color: #fff;
+    }
+
+   .btn-download {
+        background:#FF2D8D ;
+        border-color: #FF2D8D;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .btn-download:hover {
+        background:#0B1F66;
+        border-color: #0B1F66;
+        color: #fff;
+    }
+
+.card-icon{
+    color:#111;
+    font-weight:bold;
+    margin-right:6px;
+}
+</style>
+
+<div class="card filter-card">
+    <div class="card-header">
+        <h5><i class="fas fa-filter"></i> Search Filters</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="searchString" class="form-control"
+                       placeholder="Search by Title, Student Name, or LCID"
+                       value="@Context.Request.Query["searchString"]" />
+            </div>
+            <div class="col-md-3">
+                <select name="department" class="form-control">
+                    <option value="">All Departments</option>
+                    @if (ViewBag.Departments != null)
+                    {
+                        foreach (var dept in ViewBag.Departments)
+                        {
+                            <option value="@dept" selected="@(Context.Request.Query["department"] == dept ? "selected" : null)">@dept</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="year" class="form-control">
+                    <option value="">All Years</option>
+                    @if (ViewBag.Years != null)
+                    {
+                        foreach (var yr in ViewBag.Years)
+                        {
+                            <option value="@yr" selected="@(Context.Request.Query["year"] == yr.ToString() ? "selected" : null)">@yr</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary btn-search">
+                    <i class="fas fa-search"></i> Search
+                </button>
+                <a href="@Url.Action("BrowseProjects")" class="btn btn-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No projects found.</div>
+}
+else
+{
+    <div class="row">
+        @foreach (var project in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title project-card-title">@project.ProjectTitle</h5>
+                        <hr />
+                        <p class="card-text">
+                            <strong><i class="fas card-icon fa-user"></i> Student:</strong> @project.StudentName<br />
+                            <strong><i class="fas card-icon fa-id-card"></i> LCID:</strong> @project.LCID<br />
+                            <strong><i class="fas card-icon fa-calendar"></i> Submitted:</strong> @project.SubmittedDate.ToString("MMMM dd, yyyy")<br />
+                            <strong><i class="fas card-icon fa-chalkboard-teacher"></i> Supervisor:</strong> @(string.IsNullOrEmpty(project.SupervisorName) ? "N/A" : project.SupervisorName)<br />
+                            <strong><i class="fas card-icon fa-building"></i> Department:</strong> @(string.IsNullOrEmpty(project.Department) ? "N/A" : project.Department)<br />
+                            <strong><i class="fas card-icon fa-calendar-alt"></i> Year:</strong> @(project.Year == 0 ? "N/A" : project.Year.ToString())<br />
+                            <strong><i class="fas card-icon fa-clock"></i> Uploaded:</strong> @project.UploadedDate.ToString("MMMM dd, yyyy")
+                        </p>
+                        @if (!string.IsNullOrEmpty(project.Description))
+                        {
+                            <div class="mt-2">
+                                <strong>Description:</strong>
+                                <p class="text-muted small">
+                                    @(project.Description.Length > 100
+                                        ? project.Description.Substring(0, 100) + "..."
+                                        : project.Description)
+                                </p>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="@Url.Action("DownloadProject", new { id = project.Id })"
+                           class="btn btn-download btn-sm w-100">
+                            <i class="fas fa-download "></i> Download PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

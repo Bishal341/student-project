@@ -1,0 +1,132 @@
+﻿@model IEnumerable<StudentProjectPapers.Models.StudentDocument>
+
+@{
+    ViewData["Title"] = "Verify Documents";
+    Layout = "_AdminLayout";
+}
+
+<style>
+    .verify-title {
+        color: #3A2DC4;
+        font-weight: 700;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    .status-Pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .doc-type-badge {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: #6B7180;
+        margin-bottom: 0.4rem;
+    }
+
+    .verify-card .card-footer {
+        border-top: none;
+        display: flex;
+        gap: 0.5rem;
+        padding-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+</style>
+
+<h3 class="mb-4"><i class="fas fa-file-circle-check"></i> Verify Documents</h3>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No documents pending review.</div>
+}
+else
+{
+    <div class="row">
+        @foreach (var doc in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 verify-card">
+                    <div class="card-body">
+                        <span class="doc-type-badge">
+                            @(doc.DocumentType == StudentProjectPapers.Models.DocumentType.InternReport ? "Intern Report" :
+                              doc.DocumentType == StudentProjectPapers.Models.DocumentType.AttendanceReport ? "Attendance Report" : "Internship Letter")
+                        </span>
+                        <h5 class="card-title verify-title">@doc.Title</h5>
+                        <hr />
+                        <p class="card-text">
+                            <strong><i class="fas fa-user"></i> Student:</strong> @doc.StudentName<br />
+                            <strong><i class="fas fa-id-card"></i> LCID:</strong> @doc.LCID<br />
+                            <strong><i class="fas fa-building"></i> Company:</strong> @doc.CompanyName<br />
+                            <strong><i class="fas fa-calendar-alt"></i> Year:</strong> @doc.Year<br />
+                            <strong><i class="fas fa-clock"></i> Uploaded:</strong> @doc.UploadedDate.ToString("MMMM dd, yyyy")
+                        </p>
+
+                        <span class="status-badge status-Pending"><i class="fas fa-hourglass-half"></i> Pending</span>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="@Url.Action("ViewDocument", "Home", new { id = doc.Id })"
+                           target="_blank" class="btn btn-outline-secondary btn-sm flex-fill">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+
+                        <form asp-action="VerifyDocument" asp-controller="Admin" method="post" class="flex-fill">
+                            <input type="hidden" name="id" value="@doc.Id" />
+                            <button type="submit" class="btn btn-success btn-sm w-100">
+                                <i class="fas fa-check"></i> Verify
+                            </button>
+                        </form>
+
+                        <button type="button" class="btn btn-danger btn-sm flex-fill"
+                                data-bs-toggle="modal" data-bs-target="#rejectModal-@doc.Id">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reject Modal -->
+            <div class="modal fade" id="rejectModal-@doc.Id" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form asp-action="RejectDocument" asp-controller="Admin" method="post">
+                            <input type="hidden" name="id" value="@doc.Id" />
+                            <div class="modal-header">
+                                <h5 class="modal-title">Reject "@doc.Title"</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <label class="form-label fw-semibold">Reason for rejection</label>
+                                <textarea name="reason" class="form-control" rows="3"
+                                          placeholder="Explain why this document is being rejected..." required></textarea>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-danger">Confirm Reject</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

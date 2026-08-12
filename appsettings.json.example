@@ -1,0 +1,36 @@
+// =====================================================================
+// TEMPLATE - copy this file to appsettings.json locally and fill in the
+// real values from your secret store / dotnet user-secrets.
+//
+// Never edit this file with real credentials, and never commit
+// appsettings.json / appsettings.*.json (they are git-ignored).
+// Local development secrets live in user-secrets (see .env.example for
+// the list of keys). Production secrets come from environment variables
+// or the hosting provider's secret store.
+// =====================================================================
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost,1433;Database=ProjectPapers_;User Id=CHANGE_ME_DB_USER;Password=CHANGE_ME_DB_PASSWORD;MultipleActiveResultSets=true;Encrypt=true"
+  },
+  "EmailSettings": {
+    "SmtpServer": "smtp.gmail.com",
+    "SmtpPort": 587,
+    "SmtpUsername": "CHANGE_ME__smtp_username",
+    "SmtpPassword": "CHANGE_ME__smtp_app_password",
+    "FromEmail": "texasalumnipapers@gmail.com",
+    "FromName": "Student Project Papers"
+  },
+  "Jwt": {
+    "SecretKey": "REPLACE_ME__generate_a_long_random_secret_64_plus_chars_before_deploying",
+    "Issuer": "StudentProjectPapers",
+    "Audience": "StudentProjectPapersMobileApp",
+    "ExpiryMinutes": 120
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}

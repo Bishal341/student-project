@@ -1,0 +1,156 @@
+﻿@model IEnumerable<StudentProjectPapers.Models.StudentProject>
+
+@{
+    ViewData["Title"] = "Manage Projects";
+}
+
+<h2>Manage Projects</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="mb-3">
+    <a href="@Url.Action("UploadProject")" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Upload New Project
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover" id="projectsTable">
+        <thead class="table-dark">
+            <tr>
+                <th>LCID</th>
+                <th>Student Name</th>
+                <th>Project Title</th>
+                <th>Submitted Date</th>
+                <th>Uploaded Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var project in Model)
+            {
+                <tr>
+                    <td>@project.LCID</td>
+                    <td>@project.StudentName</td>
+                    <td>@(project.ProjectTitle.Length > 50 ? project.ProjectTitle.Substring(0, 50) + "..." : project.ProjectTitle)</td>
+                    <td>@project.SubmittedDate.ToShortDateString()</td>
+                    <td>@project.UploadedDate.ToShortDateString()</td>
+                    <td class="actions-cell">
+                        <a href="@Url.Action("DownloadProject", "Home", new { id = project.Id })" class="btn btn-info btn-sm" target="_blank">
+                            <i class="fas btn-download fa-download"></i> Download
+                        </a>
+                        <form asp-action="DeleteProject" method="post" style="display: inline;" class="js-delete-project-form">
+                            <input type="hidden" name="id" value="@project.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .actions-cell {
+        white-space: nowrap;
+    }
+
+    #projectsTable_wrapper {
+        overflow: auto;
+    }
+
+    .table-responsive {
+        overflow-y: auto;
+    }
+
+    .table-responsive::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Custom pagination — scoped to Projects table only, does not affect other tables */
+   #projectsTable_wrapper .dataTables_info {
+    float: left;
+    padding-top: 8px;
+}
+
+#projectsTable_wrapper .dataTables_paginate {
+    float: right;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0;
+}
+
+#projectsTable_wrapper::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+    #projectsTable_wrapper .dataTables_paginate .paginate_button {
+        text-decoration: none !important;
+        padding: 6px 14px;
+        margin: 0;
+        border-radius: 8px;
+        border: 1px solid #3A2DC4;
+        color: #3A2DC4 !important;
+        background: #fff !important;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+    }
+
+    #projectsTable_wrapper .dataTables_paginate .paginate_button:hover {
+        background: #3A2DC4 !important;
+        color: #fff !important;
+        border-color: #3A2DC4;
+    }
+
+    #projectsTable_wrapper .dataTables_paginate .paginate_button.current {
+        background: #3A2DC4 !important;
+        color: #fff !important;
+        border-color: #3A2DC4;
+    }
+
+    #projectsTable_wrapper .dataTables_paginate .paginate_button.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+</style>
+
+@section Scripts {
+    @{
+        var nonce = Context.Items["CspNonce"] as string;
+    }
+    <script nonce="@nonce">
+        $(document).ready(function() {
+            $('#projectsTable').DataTable({
+                "order": [[4, "desc"]],
+                "pageLength": 25,
+                "language": {
+                    "paginate": {
+                        "previous": "<i class='fas fa-chevron-left'></i> Prev",
+                        "next": "Next <i class='fas fa-chevron-right'></i>"
+                    }
+                }
+            });
+        });
+
+        // Unobtrusive binding replacing the former inline onsubmit handler.
+        document.querySelectorAll('.js-delete-project-form').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                if (!confirm('Are you sure you want to delete this project?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+}

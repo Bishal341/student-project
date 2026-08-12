@@ -1,0 +1,995 @@
+﻿@inject Microsoft.AspNetCore.Identity.UserManager<StudentProjectPapers.Models.ApplicationUser> UserManager
+@{
+    string currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    string currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Texas Library</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+            :root {
+                --brand-indigo: #3A2DC4;
+                --brand-indigo-dark: #241D8C;
+                --brand-pink: #E91E76;
+                --brand-pink-dark: #C1115C;
+                --brand-pink-light: #FDE8F0;
+                --ink: #1F2333;
+                --muted: #6B7180;
+                --surface: #FFFFFF;
+                --bg: #F6F7FB;
+                --border: #E7E8F1;
+                --sidebar-bg: #0B1F66;
+                --sidebar-text: #ffffff;
+                --shadow-sm: 0 2px 8px rgba(36,29,140,0.08);
+                --shadow-md: 0 10px 30px rgba(36,29,140,0.12);
+                --radius: 14px;
+            }
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            html, body {
+                height: 100%;
+                overflow-x: hidden;
+            }
+
+            body {
+                background: var(--bg);
+                font-family: "Inter", sans-serif;
+                color: var(--ink);
+            }
+
+            /* ========== SIDEBAR (matches Admin) ========== */
+            .sidebar {
+                height: 100vh;
+                width: 280px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                background: linear-gradient(135deg, #0B1F66, #081547);
+                color: white;
+                transition: all 0.3s ease;
+                z-index: 1000;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+                overflow-y: hidden;
+                overflow-x: hidden;
+                display: flex;
+                flex-direction: column;
+            }
+
+                .sidebar::-webkit-scrollbar {
+                    display: none;
+                }
+
+                .sidebar.collapsed {
+                    width: 80px;
+                }
+
+                /* sidebar */
+                .sidebar::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -30px;
+                    left: -70px;
+                    width: 350px;
+                    height: 350px;
+                    background: url('/image/sidebarlogo.png') no-repeat center/contain;
+                    opacity: 0.12;
+                    pointer-events: none;
+                    z-index: 0;
+                }
+
+            .sidebar-header {
+                padding: 25px 20px;
+                text-align: center;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                background: rgba(0,0,0,0.1);
+                position: relative;
+                z-index: 1;
+            }
+
+                .sidebar-header img {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 8px;
+                    object-fit: contain;
+                    background: #fff;
+                    padding: 3px;
+                    margin-bottom: 10px;
+                }
+
+            .sidebar.collapsed .sidebar-header img {
+                display: inline-block;
+            }
+
+            .sidebar-header h3 {
+                margin: 0;
+                font-size: 1.2rem;
+                font-family: "Poppins", sans-serif;
+                transition: all 0.3s ease;
+            }
+
+            .sidebar.collapsed .sidebar-header h3 {
+                display: none;
+            }
+
+            .sidebar-header p {
+                font-size: 0.7rem;
+                opacity: 0.8;
+                margin: 5px 0 0;
+            }
+
+            .sidebar.collapsed .sidebar-header p {
+                display: none;
+            }
+
+            /* Navigation Menu */
+            .nav-menu {
+                list-style: none;
+                padding: 20px 0;
+                margin: 0;
+                position: relative;
+                z-index: 1;
+            }
+
+            .nav-item {
+                margin-bottom: 5px;
+            }
+
+            .nav-link {
+                display: flex;
+                align-items: center;
+                padding: 12px 20px;
+                color: white;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border-radius: 8px;
+                margin: 0 10px;
+                position: relative;
+            }
+
+                .nav-link:hover {
+                    background: #FF2D8D;
+                    color: white;
+                    transform: translateX(5px);
+                }
+
+                .nav-link.active {
+                    background: linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
+                    border-left: 4px solid #ffd700;
+                    color: #fff;
+                }
+
+                    .nav-link.active:hover {
+                        color: white;
+                        background-color: #FF2D8D;
+                    }
+
+                .nav-link i {
+                    width: 30px;
+                    font-size: 1.2rem;
+                    margin-right: 15px;
+                    text-align: center;
+                }
+
+            .nav-text {
+                flex: 1;
+                transition: all 0.3s ease;
+                white-space: nowrap;
+            }
+
+            .sidebar.collapsed .nav-text {
+                display: none;
+            }
+
+            .sidebar.collapsed .nav-link i {
+                margin-right: 0;
+                width: 100%;
+            }
+
+            .sidebar-divider {
+                border-color: rgba(255,255,255,0.1);
+                margin: 15px 20px;
+            }
+
+            /* Tooltip when collapsed */
+            .sidebar.collapsed .nav-link[data-tooltip]:not(.active):hover::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                left: 70px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: #fff;
+                color: var(--ink);
+                font-size: 0.78rem;
+                font-weight: 600;
+                padding: 4px 10px;
+                border-radius: 6px;
+                white-space: nowrap;
+                box-shadow: var(--shadow-md);
+                z-index: 9999;
+            }
+
+            .sidebar-close-btn {
+                display: none;
+                position: absolute;
+                top: 14px;
+                right: 14px;
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.08);
+                border: none;
+                color: #fff;
+                font-size: 1rem;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                z-index: 10;
+                transition: background 0.2s ease;
+            }
+
+                .sidebar-close-btn:hover {
+                    background: rgba(255,255,255,0.18);
+                }
+
+            /* ========== MAIN CONTENT ========== */
+            .main-content {
+                margin-left: 280px;
+                transition: all 0.3s ease;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+                .main-content.expanded {
+                    margin-left: 80px;
+                }
+
+            .top-navbar {
+                background: #ffffff;
+                border-bottom: 1px solid var(--border);
+                padding: 0 1.5rem;
+                height: 70px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                position: sticky;
+                top: 0;
+                z-index: 999;
+                box-shadow: var(--shadow-sm);
+            }
+
+            .topbar-left {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+                .topbar-left h1 {
+                    font-family: "Poppins", sans-serif;
+                    font-size: 1.15rem;
+                    font-weight: 700;
+                    color: #111;
+                    margin: 0;
+                }
+
+            .toggle-btn {
+                background: none;
+                border: none;
+                outline: none;
+                font-size: 1.3rem;
+                color: #04031c;
+                cursor: pointer;
+                padding: 0.4rem 0.5rem;
+                border-radius: 8px;
+                transition: 0.3s;
+            }
+
+                .toggle-btn:hover {
+                    transform: scale(1.1);
+                    background: rgba(255,255,255,0.1);
+                }
+
+            .topbar-right {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .content-wrapper {
+                padding: 1.75rem;
+                flex: 1;
+            }
+
+            .footer {
+                background: white;
+                padding: 15px 30px;
+                text-align: center;
+                border-top: 1px solid #dee2e6;
+                margin-top: 30px;
+            }
+
+            /* ========== CARDS ========== */
+            .card {
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                box-shadow: var(--shadow-sm);
+                background: var(--surface);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+
+                .card:hover {
+                    transform: translateY(-3px);
+                    box-shadow: var(--shadow-md);
+                }
+
+            .btn-primary {
+                background: var(--brand-indigo);
+                border-color: var(--brand-indigo);
+                font-weight: 600;
+                border-radius: 10px;
+            }
+
+                .btn-primary:hover {
+                    background: var(--brand-indigo-dark);
+                    border-color: var(--brand-indigo-dark);
+                }
+
+            .form-control, .form-select {
+                border: 1px solid var(--border);
+                border-radius: 10px;
+            }
+
+                .form-control:focus, .form-select:focus {
+                    border-color: var(--brand-indigo);
+                    box-shadow: 0 0 0 0.2rem rgba(58,45,196,0.15);
+                }
+
+            /* ========== SEARCH ========== */
+            .navbar-search {
+                flex: 1;
+                max-width: 400px;
+                margin: 0 2rem;
+                position: relative;
+            }
+
+            .search-input-wrap {
+                display: flex;
+                align-items: center;
+                background: #F6F7FB;
+                border: 1px solid #E7E8F1;
+                border-radius: 999px;
+                padding: 0.45rem 1rem;
+                gap: 0.6rem;
+                transition: border-color 0.2s ease, box-shadow 0.2s ease;
+                position: relative;
+            }
+
+                .search-input-wrap:focus-within {
+                    border-color: #3A2DC4;
+                    box-shadow: 0 0 0 0.2rem rgba(58,45,196,0.1);
+                    background: #fff;
+                }
+
+            .search-icon {
+                color: #6B7180;
+                font-size: 0.85rem;
+                flex-shrink: 0;
+            }
+
+            .search-input-wrap input {
+                border: none;
+                background: transparent;
+                outline: none;
+                font-size: 0.88rem;
+                color: #1F2333;
+                width: 100%;
+                font-family: "Inter", sans-serif;
+            }
+
+                .search-input-wrap input::placeholder {
+                    color: #9CA3AF;
+                }
+
+            .search-dropdown {
+                display: none;
+                position: absolute;
+                top: calc(100% + 10px);
+                left: 0;
+                right: 0;
+                background: #fff;
+                border: 1px solid #E7E8F1;
+                border-radius: 14px;
+                box-shadow: 0 10px 30px rgba(36,29,140,0.12);
+                z-index: 9999;
+                overflow: hidden;
+                max-height: 380px;
+                overflow-y: auto;
+            }
+
+                .search-dropdown.show {
+                    display: block;
+                }
+
+            .search-result-item {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+                text-decoration: none;
+                color: #1F2333;
+                border-bottom: 1px solid #F6F7FB;
+                transition: background 0.15s ease;
+                cursor: pointer;
+            }
+
+                .search-result-item:last-child {
+                    border-bottom: none;
+                }
+
+                .search-result-item:hover {
+                    background: #F6F7FB;
+                }
+
+            .result-icon {
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+                background: rgba(58,45,196,0.1);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+
+                .result-icon i {
+                    color: #3A2DC4;
+                    font-size: 0.85rem;
+                }
+
+            .result-title {
+                font-weight: 600;
+                font-size: 0.88rem;
+                color: #1F2333;
+                margin-bottom: 2px;
+            }
+
+            .result-meta {
+                font-size: 0.75rem;
+                color: #6B7180;
+            }
+
+            .search-no-result {
+                padding: 1.25rem 1rem;
+                text-align: center;
+                color: #6B7180;
+                font-size: 0.88rem;
+            }
+
+            .search-footer {
+                padding: 0.6rem 1rem;
+                background: #F6F7FB;
+                text-align: center;
+                font-size: 0.8rem;
+                font-weight: 600;
+                color: #3A2DC4;
+                cursor: pointer;
+                text-decoration: none;
+                display: block;
+                border-top: 1px solid #E7E8F1;
+            }
+
+                .search-footer:hover {
+                    background: #eef0fb;
+                }
+
+            /* ========== PROFILE DROPDOWN ========== */
+            .profile-dropdown {
+                position: relative;
+            }
+
+            .profile-btn {
+                background: none;
+                border: none;
+                outline: none;
+                cursor: pointer;
+                padding: 0;
+                border-radius: 50%;
+                transition: box-shadow 0.2s ease;
+            }
+
+                .profile-btn:hover {
+                    box-shadow: 0 0 0 3px rgba(255,255,255,0.25);
+                }
+
+                .profile-btn:focus {
+                    outline: none;
+                    box-shadow: none;
+                }
+
+            .profile-avatar {
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                background: #0B1F66;
+                color: #fff;
+                font-weight: 700;
+                font-size: 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: "Poppins", sans-serif;
+                overflow: hidden;
+            }
+
+            .profile-menu {
+                display: none;
+                position: absolute;
+                top: calc(100% + 10px);
+                right: 0;
+                background: #fff;
+                border: 1px solid #E7E8F1;
+                border-radius: 14px;
+                box-shadow: 0 10px 30px rgba(36,29,140,0.14);
+                min-width: 220px;
+                z-index: 9999;
+                overflow: hidden;
+            }
+
+                .profile-menu.show {
+                    display: block;
+                }
+
+            .profile-avatar-lg {
+                width: 42px;
+                height: 42px;
+                border-radius: 50%;
+                background: #198754;
+                border-width: 4px;
+                color: #fff;
+                font-weight: 700;
+                font-size: 1.1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: "Poppins", sans-serif;
+                flex-shrink: 0;
+                overflow: hidden;
+            }
+
+            .profile-menu-name {
+                font-weight: 700;
+                font-size: 0.88rem;
+                color: #1F2333;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 140px;
+            }
+
+            .profile-menu-role {
+                font-size: 0.75rem;
+                color: #6B7180;
+                margin-top: 1px;
+            }
+
+            .profile-menu-header-link,
+            .profile-menu-header-link:hover,
+            .profile-menu-header-link:focus,
+            .profile-menu-header-link:visited,
+            .profile-menu-header-link:active {
+                text-decoration: none !important;
+                color: inherit !important;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 1rem 1.1rem 0.85rem;
+                transition: background 0.15s ease;
+                border-radius: 14px 14px 0 0;
+            }
+
+                .profile-menu-header-link:hover {
+                    background: #F6F7FB;
+                }
+
+            .profile-logout-item {
+                display: flex;
+                align-items: center;
+                gap: 0.65rem;
+                padding: 0.7rem 1.1rem;
+                color: #E91E76;
+                text-decoration: none;
+                font-size: 0.88rem;
+                font-weight: 500;
+                border-top: 1px solid #F0F1F5;
+                transition: background 0.15s ease;
+                cursor: pointer;
+            }
+
+                .profile-logout-item:hover {
+                    background: #FDE8F0;
+                    color: #E91E76;
+                }
+
+                .profile-logout-item i {
+                    width: 16px;
+                    text-align: center;
+                    color: #E91E76;
+                }
+
+            /* ========== RESPONSIVE (matches Admin) ========== */
+            @@media (max-width: 768px) {
+                .sidebar {
+                    transform: translateX(-100%);
+                }
+
+                    .sidebar.show {
+                        transform: translateX(0);
+                    }
+
+                .main-content {
+                    margin-left: 0 !important;
+                }
+
+                .overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0,0,0,0.5);
+                    z-index: 999;
+                    display: none;
+                }
+
+                    .overlay.show {
+                        display: block;
+                    }
+
+                .content-wrapper {
+                    padding: 15px;
+                }
+
+                .sidebar-close-btn {
+                    display: flex;
+                }
+
+                .toggle-btn {
+                    font-size: 1rem;
+                    padding: 0.3rem 0.4rem;
+                }
+
+                .topbar-left {
+                    gap: 0.5rem;
+                }
+
+                    .topbar-left h1 {
+                        font-size: 0.95rem;
+                    }
+
+                .navbar-search {
+                    flex: 1;
+                    max-width: none;
+                    margin: 0 0.5rem;
+                }
+
+                .search-input-wrap {
+                    padding: 0.35rem 0.7rem;
+                }
+
+                .search-icon {
+                    font-size: 0.75rem;
+                }
+
+                .search-input-wrap input {
+                    font-size: 0.8rem;
+                }
+
+                .profile-avatar {
+                    width: 30px;
+                    height: 30px;
+                    font-size: 0.85rem;
+                }
+
+                .top-navbar {
+                    padding: 0 0.75rem;
+                    gap: 0.5rem;
+                }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <button class="sidebar-close-btn" id="sidebarCloseBtn" type="button" aria-label="Close menu">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="sidebar-header">
+            <img src="~/image/logo.jpg"
+                 alt="Student Project Papers"
+                 width="80"
+                 style="border-radius:10px;margin-bottom:10px;" />
+            <h3>Student Project Papers</h3>
+            <p>User Panel</p>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a class="nav-link @(currentAction == "Index" ? "active" : "")"
+                   asp-controller="Home" asp-action="Index" data-tooltip="Home">
+                    <i class="fas fa-house"></i>
+                    <span class="nav-text">Home</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(currentAction == "BrowseProjects" ? "active" : "")"
+                   asp-controller="Home" asp-action="BrowseProjects" data-tooltip="Browse Projects">
+                    <i class="fas fa-search"></i>
+                    <span class="nav-text">Browse Projects</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(currentAction == "InternReport" ? "active" : "")"
+                   asp-controller="Home" asp-action="InternReport" data-tooltip="Intern Report">
+                    <i class="fas fa-briefcase"></i>
+                    <span class="nav-text">Upload your report</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(currentAction == "MyActivity" ? "active" : "")"
+                   asp-controller="Home" asp-action="MyActivity" data-tooltip="My Activity">
+                    <i class="fas fa-clock-rotate-left"></i>
+                    <span class="nav-text">My Activity</span>
+                </a>
+            </li>
+
+           
+        </ul>
+
+        @{
+            var sidebarUser = await UserManager.GetUserAsync(User);
+        }
+        @if (!string.IsNullOrEmpty(sidebarUser?.Faculty))
+        {
+            <div style="padding: 16px 20px; margin-top: auto;">
+                <span style="display:inline-block; background: rgba(255,255,255,0.1); color:#fff;
+                    padding: 4px 12px; border-radius: 999px; font-size: 0.75rem;
+                    font-weight: 600; letter-spacing: 0.03em;">
+                    <i class="fas fa-graduation-cap" style="margin-right:5px;"></i>@sidebarUser.Faculty
+                </span>
+            </div>
+        }
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="top-navbar">
+            <div class="topbar-left">
+                <button class="toggle-btn" id="userSidebarToggleBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>@ViewData["Title"]</h1>
+            </div>
+
+            <div class="navbar-search">
+                <div class="search-input-wrap">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="globalSearch"
+                           placeholder="Search projects, reports..."
+                           autocomplete="off" />
+                    <div class="search-dropdown" id="searchDropdown"></div>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <div class="profile-dropdown" id="profileDropdown">
+                    <button class="profile-btn" id="profileBtn">
+                        <div class="profile-avatar">
+                            @await Html.PartialAsync("_ProfileAvatar")
+                        </div>
+                    </button>
+                    <div class="profile-menu" id="profileMenu">
+                        @{
+                            var currentUser = await UserManager.GetUserAsync(User);
+                        }
+                        <a href="@Url.Action("MyProfile", "Home")"
+                           class="profile-menu-header-link">
+                            <div class="profile-avatar-lg">
+                                @await Html.PartialAsync("_ProfileAvatar")
+                            </div>
+                            <div>
+                                <div class="profile-menu-name">@currentUser?.FullName</div>
+                                <div class="profile-menu-role">Student</div>
+                            </div>
+                        </a>
+                        <a href="#" class="profile-logout-item" id="userLogoutLink">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            @RenderBody()
+        </div>
+
+        <div class="footer">
+            &copy; @DateTime.Now.Year - Student Project Papers
+        </div>
+    </div>
+
+    <!-- Hidden logout form -->
+    <form id="userLogoutForm" asp-controller="Account" asp-action="Logout"
+          method="post" style="display:none;">
+        @Html.AntiForgeryToken()
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    @{
+        var nonce = Context.Items["CspNonce"] as string;
+    }
+    <script nonce="@nonce">
+            // Sidebar toggle (matches Admin behavior)
+            function toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const mainContent = document.getElementById('mainContent');
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('show');
+                    document.getElementById('overlay').classList.toggle('show');
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded');
+                    localStorage.setItem('userSidebarCollapsed', sidebar.classList.contains('collapsed'));
+                }
+            }
+
+            // Unobtrusive bindings replacing the former inline event handlers.
+            document.getElementById('userSidebarToggleBtn').addEventListener('click', function () {
+                toggleSidebar();
+            });
+            document.getElementById('userLogoutLink').addEventListener('click', function (e) {
+                e.preventDefault();
+                document.getElementById('userLogoutForm').submit();
+            });
+
+            // Load saved sidebar state
+            if (localStorage.getItem('userSidebarCollapsed') === 'true') {
+                document.getElementById('sidebar')?.classList.add('collapsed');
+                document.getElementById('mainContent')?.classList.add('expanded');
+            }
+
+            document.getElementById('overlay').addEventListener('click', function () {
+                document.getElementById('sidebar').classList.remove('show');
+                this.classList.remove('show');
+            });
+
+            document.getElementById('sidebarCloseBtn')?.addEventListener('click', function () {
+                document.getElementById('sidebar').classList.remove('show');
+                document.getElementById('overlay').classList.remove('show');
+            });
+
+            // Profile dropdown
+            document.getElementById('profileBtn').addEventListener('click', function (e) {
+                e.stopPropagation();
+                document.getElementById('profileMenu').classList.toggle('show');
+            });
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('#profileDropdown')) {
+                    document.getElementById('profileMenu').classList.remove('show');
+                }
+            });
+
+            // Search
+            var searchInput = document.getElementById('globalSearch');
+            var dropdown = document.getElementById('searchDropdown');
+            var searchTimer = null;
+
+            searchInput.addEventListener('input', function () {
+                var query = this.value.trim();
+                clearTimeout(searchTimer);
+                if (query.length < 2) {
+                    dropdown.classList.remove('show');
+                    dropdown.innerHTML = '';
+                    return;
+                }
+                searchTimer = setTimeout(function () {
+                    fetch('/Home/SearchProjects?query=' + encodeURIComponent(query))
+                        .then(function (res) { return res.json(); })
+                        .then(function (data) {
+                            dropdown.innerHTML = '';
+                            if (data.length === 0) {
+                                var noResult = document.createElement('div');
+                                noResult.className = 'search-no-result';
+                                var searchIcon = document.createElement('i');
+                                searchIcon.className = 'fas fa-search';
+                                noResult.appendChild(searchIcon);
+                                noResult.appendChild(document.createTextNode(' No results found for "'));
+                                var queryStrong = document.createElement('strong');
+                                queryStrong.textContent = query;
+                                noResult.appendChild(queryStrong);
+                                noResult.appendChild(document.createTextNode('"'));
+                                dropdown.appendChild(noResult);
+                            } else {
+                                data.forEach(function (item) {
+                                    var div = document.createElement('a');
+                                    div.className = 'search-result-item';
+                                    div.href = '/Home/BrowseProjects?searchString=' + encodeURIComponent(item.projectTitle);
+
+                                    var resultIcon = document.createElement('div');
+                                    resultIcon.className = 'result-icon';
+                                    var fileIcon = document.createElement('i');
+                                    fileIcon.className = 'fas fa-file-alt';
+                                    resultIcon.appendChild(fileIcon);
+
+                                    var contentDiv = document.createElement('div');
+                                    var title = document.createElement('div');
+                                    title.className = 'result-title';
+                                    title.textContent = item.projectTitle;
+                                    contentDiv.appendChild(title);
+
+                                    var meta = document.createElement('div');
+                                    meta.className = 'result-meta';
+                                    var userIcon = document.createElement('i');
+                                    userIcon.className = 'fas fa-user';
+                                    meta.appendChild(userIcon);
+                                    meta.appendChild(document.createTextNode(' ' + item.studentName));
+                                    meta.appendChild(document.createTextNode(' \u00a0|\u00a0 '));
+                                    var buildingIcon = document.createElement('i');
+                                    buildingIcon.className = 'fas fa-building';
+                                    meta.appendChild(buildingIcon);
+                                    meta.appendChild(document.createTextNode(' ' + (item.department || 'N/A')));
+                                    meta.appendChild(document.createTextNode(' \u00a0|\u00a0 '));
+                                    var calendarIcon = document.createElement('i');
+                                    calendarIcon.className = 'fas fa-calendar';
+                                    meta.appendChild(calendarIcon);
+                                    meta.appendChild(document.createTextNode(' ' + (item.year || 'N/A')));
+
+                                    contentDiv.appendChild(meta);
+                                    div.appendChild(resultIcon);
+                                    div.appendChild(contentDiv);
+                                    dropdown.appendChild(div);
+                                });
+                                var footer = document.createElement('a');
+                                footer.className = 'search-footer';
+                                footer.href = '/Home/BrowseProjects?searchString=' + encodeURIComponent(query);
+                                var footerIcon = document.createElement('i');
+                                footerIcon.className = 'fas fa-search';
+                                footer.appendChild(footerIcon);
+                                footer.appendChild(document.createTextNode(' See all results for "' + query + '"'));
+                                dropdown.appendChild(footer);
+                            }
+                            dropdown.classList.add('show');
+                        })
+                        .catch(function () { dropdown.classList.remove('show'); });
+                }, 350);
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.navbar-search')) {
+                    dropdown.classList.remove('show');
+                }
+            });
+
+            searchInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    window.location.href = '/Home/BrowseProjects?searchString=' + encodeURIComponent(this.value.trim());
+                }
+            });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

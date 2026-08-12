@@ -1,0 +1,669 @@
+﻿@inject Microsoft.AspNetCore.Identity.UserManager<StudentProjectPapers.Models.ApplicationUser> UserManager
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" />
+    <meta name="csrf-token" content="@(ViewContext.HttpContext.Request.Headers["RequestVerificationToken"])" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            overflow-x: hidden;
+        }
+
+        /* ========== SIDEBAR STYLES ========== */
+        .sidebar {
+            height: 100vh;
+            width: 280px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #0B1F66, #081547);
+            color: white;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            overflow-y: hidden;
+            overflow-x: hidden;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        /* Watermark logo at bottom of sidebar */
+        .sidebar::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
+            width: 250px;
+            height: 250px;
+            background: url('/image/sidebarlogo.png') no-repeat center/contain;
+            opacity: 0.12;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .sidebar-header h3 {
+            display: none;
+        }
+
+        .sidebar-header .logo-icon {
+            font-size: 2.5rem;
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-header .logo-icon {
+            display: block;
+        }
+
+        .sidebar-header p {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin: 5px 0 0;
+        }
+
+        .sidebar.collapsed .sidebar-header p {
+            display: none;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            list-style: none;
+            padding: 20px 0;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 0 10px;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background: #FF2D8D;
+            color:white;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
+            border-left: 4px solid #ffd700;
+        }
+
+        .nav-link.active:hover {
+            color: white;
+            background-color: #FF2D8D;
+            }
+
+        .nav-link i {
+            width: 30px;
+            font-size: 1.2rem;
+            margin-right: 15px;
+            text-align: center;
+        }
+
+        .nav-text {
+            flex: 1;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-link i {
+            margin-right: 0;
+            width: 100%;
+        }
+
+        .nav-badge {
+            background: #ff4757;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        .keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+
+        .sidebar-divider {
+            border-color: rgba(255,255,255,0.1);
+            margin: 15px 20px;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            margin-left: 280px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .main-content.expanded {
+            margin-left: 80px;
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #2a5298;
+            transition: 0.3s;
+        }
+
+        .toggle-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .user-avatar:hover {
+            box-shadow: 0 0 0 3px rgba(42,82,152,0.25);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .admin-avatar-dropdown {
+            position: relative;
+        }
+
+        .admin-avatar-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            min-width: 220px;
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        .admin-avatar-menu.show {
+            display: block;
+        }
+
+        .admin-menu-header {
+            padding: 1.2rem 1.1rem;
+            text-align: center;
+        }
+
+        .admin-menu-avatar-wrap {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+
+        .admin-menu-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .admin-menu-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .admin-camera-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .admin-camera-btn i {
+            font-size: 0.65rem;
+            color: #2a5298;
+        }
+
+        .admin-menu-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1e3c72;
+        }
+
+        .admin-menu-email {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 2px;
+            word-break: break-all;
+        }
+            
+        .content-wrapper {
+            padding: 30px;
+        }
+
+        .footer {
+            background: white;
+            padding: 15px 30px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+            margin-top: 30px;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+                display: none;
+            }
+            .overlay.show {
+                display: block;
+            }
+            .content-wrapper {
+                padding: 15px;
+            }
+
+            .top-navbar {
+            padding: 0.75rem 1rem;
+        }
+
+        .user-info span {
+            display: none;
+        }
+
+        .toggle-btn {
+            font-size: 1.1rem;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+        }
+
+        .row.mb-4 > [class*="col-"] {
+        margin-bottom: 0.75rem;
+    }
+
+    .card-body h2 {
+        font-size: 1.5rem;
+    }
+
+    .card-body h6 {
+        font-size: 0.85rem;
+    }
+
+    /* Quick Action buttons: stack full width, comfortable tap size */
+    .card-body .btn {
+        display: block;
+        width: 100%;
+        margin: 0 0 0.6rem 0 !important;
+        white-space: normal;
+        text-align: center;
+        padding: 0.75rem 1rem;
+    }
+
+    /* Tables (ManageProjects, Users, PendingUsers, VerifyDocuments): allow horizontal scroll instead of squishing */
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+
+    .table-responsive .btn {
+        width: auto;
+        display: inline-block;
+        margin: 0 2px !important;
+        padding: 0.35rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    /* Card headers */
+    .card-header h5 {
+        font-size: 1rem;
+    }
+    }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <h3>Admin Panel</h3>
+            <p>Texas Student Projects</p>
+        </div>
+
+        <ul class="nav-menu">
+    <li class="nav-item">
+        <a class="nav-link" asp-controller="Admin" asp-action="@(ViewBag.DashboardAction ?? "DashboardSuperAdmin")">
+            <i class="fas fa-tachometer-alt"></i>
+            <span class="nav-text">Dashboard</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" asp-controller="Admin" asp-action="PendingUsers">
+            <i class="fas fa-user-clock"></i>
+            <span class="nav-text">Pending Approvals</span>
+            <span class="nav-badge" id="pendingCount" style="display: none;">0</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" asp-controller="Admin" asp-action="UploadProject">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span class="nav-text">Upload Project</span>
+        </a>
+    </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Admin" asp-action="ManageProjects">
+                    <i class="fas fa-folder-open"></i>
+                    <span class="nav-text">Manage Projects</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Admin" asp-action="VerifyDocuments">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span class="nav-text">Verify Documents</span>
+                    <span class="nav-badge" id="pendingDocsCount" style="display: none;">0</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")" asp-controller="Admin" asp-action="Users">
+                    <i class="fas fa-users-cog"></i>
+                    <span class="nav-text">User Management</span>
+                </a>
+            </li>
+
+    
+    <li class="nav-item">
+    <a class="nav-link" asp-controller="Account" asp-action="Logout" id="adminLogoutLink">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="nav-text">Logout</span>
+    </a>
+    <form id="logoutForm" asp-controller="Account" asp-action="Logout" method="post" style="display: none;">
+        @Html.AntiForgeryToken()
+    </form>
+</li>
+</ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="top-navbar">
+            <button class="toggle-btn" id="sidebarToggleBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            @{
+                var currentAdmin = await UserManager.GetUserAsync(User);
+            }
+            
+            <div class="user-info">
+                <div class="admin-avatar-dropdown" id="adminAvatarDropdown">
+                    <button class="user-avatar" id="adminAvatarBtn" type="button">
+                        @if (!string.IsNullOrEmpty(currentAdmin?.ProfilePicture))
+                        {
+                            <img src="@currentAdmin.ProfilePicture" alt="Profile" />
+                        }
+                        else
+                        {
+                            @(currentAdmin?.FullName?.Substring(0, 1).ToUpper() ?? "A")
+                        }
+                    </button>
+
+                    <div class="admin-avatar-menu" id="adminAvatarMenu">
+                        <div class="admin-menu-header">
+                            <div class="admin-menu-avatar-wrap">
+                                <div class="admin-menu-avatar">
+                                    @if (!string.IsNullOrEmpty(currentAdmin?.ProfilePicture))
+                                    {
+                                        <img src="@currentAdmin.ProfilePicture" alt="Profile" />
+                                    }
+                                    else
+                                    {
+                                        @(currentAdmin?.FullName?.Substring(0, 1).ToUpper() ?? "A")
+                                    }
+                                </div>
+                                <label for="adminProfileImageInput" class="admin-camera-btn">
+                                    <i class="fas fa-camera"></i>
+                                </label>
+                            </div>
+                            <div class="admin-menu-name">@currentAdmin?.FullName</div>
+                            <div class="admin-menu-email">@currentAdmin?.Email</div>
+                        </div>
+                    </div>
+
+                    <form asp-controller="Home" asp-action="UploadProfilePicture" method="post"
+                          enctype="multipart/form-data" id="adminProfilePicForm" style="display:none;">
+                        <input type="file" id="adminProfileImageInput" name="profileImage"
+                               accept="image/*" />
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            @RenderBody()
+        </div>
+
+        <div class="footer">
+            &copy; @DateTime.Now.Year - Student Project Papers Admin Panel
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    
+    @{
+        var nonce = Context.Items["CspNonce"] as string;
+    }
+    <script nonce="@nonce">
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        }
+
+        // Unobtrusive bindings replacing the former inline event handlers.
+        document.getElementById('adminLogoutLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('logoutForm').submit();
+        });
+        document.getElementById('sidebarToggleBtn').addEventListener('click', function () {
+            toggleSidebar();
+        });
+        document.getElementById('adminProfileImageInput').addEventListener('change', function () {
+            document.getElementById('adminProfilePicForm').submit();
+        });
+
+            document.getElementById('adminAvatarBtn').addEventListener('click', function (e) {
+                e.stopPropagation();
+                document.getElementById('adminAvatarMenu').classList.toggle('show');
+            });
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('#adminAvatarDropdown')) {
+                    document.getElementById('adminAvatarMenu').classList.remove('show');
+                }
+            });
+
+        // Load saved sidebar state
+   
+        if (window.innerWidth > 768 && localStorage.getItem('sidebarCollapsed') === 'true') {
+            document.getElementById('sidebar')?.classList.add('collapsed');
+            document.getElementById('mainContent')?.classList.add('expanded');
+        }
+
+        // Set active link based on current URL
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') && currentPath.includes(link.getAttribute('href'))) {
+                link.classList.add('active');
+            }
+        });
+
+        // Fetch pending users count
+        function fetchPendingCount() {
+            $.get('/Admin/GetPendingUsersCount', function(data) {
+                const badge = $('#pendingCount');
+                if (data.count > 0) {
+                    badge.text(data.count).show();
+                } else {
+                    badge.hide();
+                }
+                const statCard = $('#pendingApprovalsCount');
+                if (statCard.length) {
+                    statCard.text(data.count);
+                }
+            });
+        }
+        fetchPendingCount();
+        setInterval(fetchPendingCount, 30000);
+
+                    function fetchPendingDocsCount() {
+                $.get('/Admin/GetPendingDocumentsCount', function(data) {
+                    const badge = $('#pendingDocsCount');
+                    if (data.count > 0) {
+                        badge.text(data.count).show();
+                    } else {
+                        badge.hide();
+                    }
+                });
+            }
+            fetchPendingDocsCount();
+            setInterval(fetchPendingDocsCount, 30000);
+
+        // Mobile menu
+        $('.toggle-btn').on('click', function() {
+            if (window.innerWidth <= 768) {
+                $('#sidebar').toggleClass('show');
+                $('#overlay').toggleClass('show');
+            }
+        });
+        $('#overlay').on('click', function() {
+            $('#sidebar').removeClass('show');
+            $('#overlay').removeClass('show');
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

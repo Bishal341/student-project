@@ -1,0 +1,214 @@
+﻿@model StudentProjectPapers.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "My Profile";
+    Layout = "_UserLayout";
+}
+
+<style>
+    .profile-card-header {
+        background: #0B1F66;
+        border-radius: 14px 14px 0 0;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        color: #fff;
+    }
+
+    .profile-big-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.25);
+        color: #fff;
+        font-size: 2rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-family: "Poppins", sans-serif;
+        border: 3px solid rgba(255,255,255,0.4);
+    }
+
+    .profile-card-header h4 {
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+
+    .profile-card-header p { opacity: 0.85; font-size: 0.88rem; margin: 0; }
+
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.9rem 0;
+        border-bottom: 1px solid #F0F1F5;
+    }
+
+    .info-row:last-child { border-bottom: none; }
+
+    .info-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: rgba(58,45,196,0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .info-icon i { color: #3A2DC4; font-size: 0.85rem; }
+    .info-label { font-size: 0.75rem; color: #6B7180; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+    .info-value { font-size: 0.92rem; font-weight: 600; color: #1F2333; }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    .status-approved { background: #d1fae5; color: #065f46; }
+    .status-verified { background: #dbeafe; color: #1e40af; }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card overflow-hidden">
+           <div class="profile-card-header">
+    <div style="position:relative;display:inline-block;margin-bottom:1rem;">
+        <div class="profile-big-avatar">
+            @if (!string.IsNullOrEmpty(Model?.ProfilePicture))
+            {
+                <img src="@Model.ProfilePicture" alt="Profile"
+                     style="width:80px;height:80px;border-radius:50%;object-fit:cover;" />
+            }
+            else
+            {
+                @(Model?.FullName?.Substring(0,1).ToUpper() ?? "U")
+            }
+        </div>
+        <!-- Camera icon to upload -->
+        <label for="profileImageInput"
+               style="position:absolute;bottom:0;right:0;width:26px;height:26px;
+                      border-radius:50%;background:#fff;display:flex;align-items:center;
+                      justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.2);
+                      border:2px solid #E7E8F1;">
+            <i class="fas fa-camera" style="font-size:0.7rem;color:#3A2DC4;"></i>
+        </label>
+        <form asp-action="UploadProfilePicture" method="post"
+              enctype="multipart/form-data" id="profilePicForm"
+              style="display:none;">
+            <input type="file" id="profileImageInput" name="profileImage"
+                   accept="image/*" />
+        </form>
+    </div>
+    <h4>@Model?.FullName</h4>
+    <p>@Model?.Email</p>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success mt-2 py-1 px-3" style="font-size:0.82rem;">
+            @TempData["Success"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger mt-2 py-1 px-3" style="font-size:0.82rem;">
+            @TempData["Error"]
+        </div>
+    }
+</div>
+            <div class="card-body px-4 py-3">
+                <div class="info-row">
+                    <div class="info-icon"><i class="fas fa-user"></i></div>
+                    <div>
+                        <div class="info-label">Full Name</div>
+                        <div class="info-value">@Model?.FullName</div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                    <div>
+                        <div class="info-label">Email Address</div>
+                        <div class="info-value">@Model?.Email</div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon"><i class="fas fa-calendar"></i></div>
+                    <div>
+                        <div class="info-label">Registered Date</div>
+                        <div class="info-value">@Model?.RegisteredDate.ToString("MMMM dd, yyyy")</div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div>
+                        <div class="info-label">Account Status</div>
+                        <div class="info-value">
+                            @if (Model?.IsApproved == true)
+                            {
+                                <span class="status-badge status-approved">
+                                    <i class="fas fa-check-circle"></i> Approved
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-badge" style="background:#fef3c7;color:#92400e;">
+                                    <i class="fas fa-clock"></i> Pending
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon"><i class="fas fa-envelope-open-text"></i></div>
+                    <div>
+                        <div class="info-label">Email Verified</div>
+                        <div class="info-value">
+                            @if (Model?.IsEmailVerified == true)
+                            {
+                                <span class="status-badge status-verified">
+                                    <i class="fas fa-check-circle"></i> Verified
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-badge" style="background:#fee2e2;color:#991b1b;">
+                                    <i class="fas fa-times-circle"></i> Not Verified
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                @if (Model?.ApprovedDate != null)
+                {
+                    <div class="info-row">
+                        <div class="info-icon"><i class="fas fa-calendar-check"></i></div>
+                        <div>
+                            <div class="info-label">Approved Date</div>
+                            <div class="info-value">@Model.ApprovedDate?.ToString("MMMM dd, yyyy")</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        var nonce = Context.Items["CspNonce"] as string;
+    }
+    <script nonce="@nonce">
+        // Unobtrusive binding replacing the former inline onchange handler.
+        document.getElementById('profileImageInput').addEventListener('change', function () {
+            document.getElementById('profilePicForm').submit();
+        });
+    </script>
+}
